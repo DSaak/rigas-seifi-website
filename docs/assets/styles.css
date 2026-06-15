@@ -129,12 +129,22 @@ h3 { font-size: 1.15rem; }
 .hero-stats span { color: var(--ink-dim); font-size: 0.88rem; }
 @media (min-width: 720px) { .hero-stats { grid-template-columns: repeat(4, 1fr); } }
 
-/* ---------- Promo ---------- */
-.promo { display: none; background: linear-gradient(90deg, var(--gold), var(--gold-bright)); color: #14110a; padding: 0.9rem 0; }
-.promo[data-active="true"] { display: block; }
-.promo-inner { display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem 1.2rem; }
-.promo-badge { background: #14110a; color: var(--gold-bright); border-radius: 999px; padding: 0.25rem 0.8rem; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.06em; }
-.promo-text { font-weight: 600; }
+/* ---------- Promo ribbon (controlled from PROMO in content.py) ---------- */
+.promo-bar {
+  position: relative; display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+  color: #14110a; padding: 0.6rem 2.6rem 0.6rem 1rem; text-align: center;
+  font-weight: 600; font-size: 0.95rem;
+}
+.promo-bar a { color: #14110a; text-decoration: none; }
+.promo-bar a:hover { text-decoration: underline; }
+.promo-bar .promo-arrow { font-weight: 700; }
+.promo-close {
+  position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);
+  width: 30px; height: 30px; border: 0; background: transparent; color: #14110a;
+  font-size: 1.3rem; line-height: 1; cursor: pointer; border-radius: 50%;
+}
+.promo-close:hover { background: rgba(0, 0, 0, 0.12); }
 
 /* ---------- Advantages ---------- */
 .adv-grid { display: grid; gap: 1.4rem; }

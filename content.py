@@ -11,6 +11,20 @@ security specs, address) are taken from the existing rigasseifi.lv site.
 LANGS = ["lv", "ru", "en"]
 DEFAULT_LANG = "lv"
 
+# =====================================================================
+#  ADVERT RIBBON  —  the bright bar at the very top of every page.
+#  To TURN OFF: change "active" to False.   To TURN ON: set it to True.
+#  To CHANGE THE TEXT: edit the lv / ru / en lines below.
+#  After any change: run python3 build.py (or double-click publish.command).
+# =====================================================================
+PROMO = {
+    "active": True,
+    "link": "#book",   # where clicking the bar takes the visitor
+    "lv": "🔑 Atvēršanas akcija — pirmais mēnesis −50 %. Vietu skaits ierobežots.",
+    "ru": "🔑 Акция к открытию — первый месяц −50 %. Количество мест ограничено.",
+    "en": "🔑 Opening offer — first month −50 %. Limited number of boxes.",
+}
+
 SITE = {
     "domain": "https://rigasseifi.lv",
     "brand": "Rīgas Seifi",

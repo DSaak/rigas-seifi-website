@@ -159,6 +159,20 @@ def schema_blocks(lang, page):
 def _active(cond):
     return ' class="active"' if cond else ''
 
+def promo_bar(lang):
+    p = getattr(C, "PROMO", {})
+    if not p.get("active"):
+        return ""
+    text = p.get(lang, "")
+    if not text:
+        return ""
+    import hashlib
+    key = hashlib.md5(text.encode("utf-8")).hexdigest()[:8]  # dismiss resets when text changes
+    link = p.get("link", "#book")
+    return (f'<div class="promo-bar" id="promoBar" data-key="{key}">'
+            f'<a href="{esc(link)}">{esc(text)}</a>'
+            f'<button class="promo-close" id="promoClose" aria-label="Close">&times;</button></div>')
+
 def header(lang, current):
     u = C.UI[lang]
     nav_links = "".join(
@@ -169,7 +183,7 @@ def header(lang, current):
         f'<a href="{link_lang(l, current)}" hreflang="{l}"{_active(l == lang)}>{l.upper()}</a>'
         for l in C.LANGS
     )
-    return f"""<header class="site-header" id="top">
+    return f"""{promo_bar(lang)}<header class="site-header" id="top">
   <div class="container header-inner">
     <a class="logo" href="{link('index')}" aria-label="{esc(S['brand'])}">{LOGO_SVG}<span class="logo-text">RĪGAS&nbsp;SEIFI</span></a>
     <button class="nav-toggle" id="navToggle" aria-label="{esc(u['menu'])}" aria-expanded="false" aria-controls="mobileNav">

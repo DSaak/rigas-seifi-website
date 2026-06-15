@@ -5,6 +5,20 @@
 /* Remember chosen language for the root redirect */
 try { localStorage.setItem("lang", document.documentElement.lang || "lv"); } catch (e) {}
 
+/* ---- Promo ribbon dismiss (re-shows automatically when the text changes) ---- */
+const promoBar = document.getElementById("promoBar");
+if (promoBar) {
+  const key = promoBar.getAttribute("data-key");
+  let dismissed = null;
+  try { dismissed = localStorage.getItem("promoDismissed"); } catch (e) {}
+  if (dismissed === key) promoBar.remove();
+  const closeBtn = document.getElementById("promoClose");
+  if (closeBtn) closeBtn.addEventListener("click", () => {
+    try { localStorage.setItem("promoDismissed", key); } catch (e) {}
+    promoBar.remove();
+  });
+}
+
 /* ---- Mobile nav ---- */
 const navToggle = document.getElementById("navToggle");
 const mobileNav = document.getElementById("mobileNav");

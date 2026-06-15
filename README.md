@@ -30,6 +30,14 @@ Unique title/description/keywords per page per language, canonical + hreflang
 (LocalBusiness everywhere, FAQPage on FAQ, Product list on boxes,
 BreadcrumbList on inner pages), sitemap with hreflang alternates, robots.txt.
 
+## Advert ribbon (bright top bar)
+Controlled by the `PROMO` block at the top of `content.py`:
+- `"active": True / False` — turn the bar on or off everywhere.
+- `"lv"/"ru"/"en"` — the text per language.
+- `"link"` — where clicking it goes (default `#book`).
+Visitors can dismiss it with ×; it reappears automatically whenever you change
+the text. Rebuild/publish after editing.
+
 ## Versioning
 Run `sh snapshot.sh "label"` after a round of changes. Snapshots live in
 `../Rigas Seifi Website - versions/` and the script auto-prunes to the
