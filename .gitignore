@@ -6,3 +6,6 @@ __pycache__/
 .DS_Store
 
 # Note: docs/ (the generated site) IS committed — GitHub Pages serves it.
+
+# local file-based snapshots (own history; not tracked in git)
+versions/

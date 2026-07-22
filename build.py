@@ -52,6 +52,54 @@ ICONS = {
 def icon(name):
     return f'<svg viewBox="0 0 24 24" aria-hidden="true">{ICONS.get(name, ICONS["box"])}</svg>'
 
+
+# ---------- media placeholders (real photos / video pending) ----------
+CAMERA_SVG = '<svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m3 17 5-5 4 4 3-3 6 6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>'
+PLAY_SVG = '<span class="play-badge"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>'
+
+MEDIA_TXT = {
+    "photo": {"lv": "Šeit būs reāls foto no glabātavas",
+              "ru": "Здесь будет реальное фото хранилища",
+              "en": "A real vault photo goes here"},
+    "video": {"lv": "Šeit būs video par drošību",
+              "ru": "Здесь будет видео о безопасности",
+              "en": "A security video goes here"},
+    "hero":  {"lv": "Foto vai video no glabātavas",
+              "ru": "Фото или видео хранилища",
+              "en": "Photo or video of the vault"},
+}
+
+def media_placeholder(lang, kind="photo", extra=""):
+    ic = PLAY_SVG if kind == "video" else CAMERA_SVG
+    txt = MEDIA_TXT[kind][lang]
+    cls = " tall" if kind in ("video", "hero") else ""
+    return f'<div class="media-placeholder{cls}{extra}">{ic}<p>{esc(txt)}</p></div>'
+
+
+# ---------- isometric safe illustration (per box size) ----------
+def safe_svg(h):
+    """Simple isometric line-art box; h = box height in viewBox px."""
+    import math
+    ox, oy = 80, 104           # front-bottom corner
+    ux, uy = 52, -26           # iso axis to the right-back
+    vx, vy = -34, -17          # iso axis to the left-back
+    F = (ox, oy)
+    R = (ox + ux, oy + uy)
+    L = (ox + vx, oy + vy)
+    B = (ox + ux + vx, oy + uy + vy)
+    def up(p): return (p[0], p[1] - h)
+    def pts(*ps): return " ".join(f"{x},{y}" for x, y in ps)
+    Ft, Rt, Lt, Bt = up(F), up(R), up(L), up(B)
+    # keyhole detail on the right face, scaled to the face height
+    kx, ky = ox + ux * 0.5, oy + uy * 0.5 - h * 0.5
+    kr = min(3.2, h * 0.24)
+    return f'''<svg viewBox="0 0 160 116" aria-hidden="true">
+<polygon points="{pts(F, L, Lt, Ft)}" fill="#fafaf8" stroke="#1b3a6b" stroke-width="1.5" stroke-linejoin="round"/>
+<polygon points="{pts(F, R, Rt, Ft)}" fill="#f0ede6" stroke="#1b3a6b" stroke-width="1.5" stroke-linejoin="round"/>
+<polygon points="{pts(Ft, Rt, Bt, Lt)}" fill="#f5e6c8" stroke="#1b3a6b" stroke-width="1.5" stroke-linejoin="round"/>
+<circle cx="{kx:.0f}" cy="{ky:.1f}" r="{kr:.1f}" fill="none" stroke="#b8972a" stroke-width="1.5"/>
+</svg>'''
+
 WA_SVG = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .2-3.2-.7-2.7-1.1-4.4-3.8-4.6-4-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9.9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.4l.9 2.1c.1.2.1.4 0 .6l-.4.6-.5.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.2 1.4 2.5 1.5.3.1.5.1.7-.1l1-1.2c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.4.1 0 .1.6-.1 1.3Z"/></svg>'
 LOGO_SVG = '<svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="20" cy="20" r="9" fill="none" stroke="currentColor" stroke-width="2"/><line x1="20" y1="3" x2="20" y2="11" stroke="currentColor" stroke-width="2.5"/><line x1="20" y1="29" x2="20" y2="37" stroke="currentColor" stroke-width="2.5"/><line x1="3" y1="20" x2="11" y2="20" stroke="currentColor" stroke-width="2.5"/><line x1="29" y1="20" x2="37" y2="20" stroke="currentColor" stroke-width="2.5"/></svg>'
 WA_HREF = lambda lang: f"https://wa.me/{S['wa_number']}?text={html.escape(__import__('urllib.parse', fromlist=['quote']).quote(C.UI[lang]['wa_msg']), quote=True)}"
@@ -95,10 +143,10 @@ def head(lang, page):
 <meta property="og:locale" content="{ {'lv':'lv_LV','ru':'ru_RU','en':'en_GB'}[lang] }">
 <meta property="og:image" content="{esc(og_img)}">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#0e1116">
+<meta name="theme-color" content="#0f2044">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{ASSET}/styles.css">
 {schema_blocks(lang, page)}
 </head>
@@ -244,7 +292,7 @@ def footer(lang):
   <p>{esc(u['cookie_text'])}</p>
   <div class="cookie-actions">
     <button class="btn btn-gold btn-sm" id="cookieAccept">{esc(u['cookie_accept'])}</button>
-    <button class="btn btn-ghost btn-sm" id="cookieDecline">{esc(u['cookie_decline'])}</button>
+    <button class="btn btn-outline btn-sm" id="cookieDecline">{esc(u['cookie_decline'])}</button>
   </div>
 </div>
 <script src="{ASSET}/app.js"></script>
@@ -266,28 +314,32 @@ def page_hero(lang, title, sub=""):
     return f"""<section class="page-hero"><div class="container"><h1>{esc(title)}</h1>{sub_html}</div></section>"""
 
 def advantages(lang):
-    icons = ["shield", "lock", "clock"]
+    # real photos instead of icons (moodboard note 3); placeholders until shot
     cards = "".join(
-        f'<article class="adv reveal"><div class="adv-icon">{icon(icons[i])}</div><h3>{esc(t)}</h3><p>{esc(p)}</p></article>'
-        for i, (t, p) in enumerate(C.ADV[lang]))
+        f'<article class="adv reveal"><div class="adv-photo">{media_placeholder(lang)}</div>'
+        f'<div class="adv-body"><h3>{esc(t)}</h3><p>{esc(p)}</p></div></article>'
+        for t, p in C.ADV[lang])
     return f'<section class="advantages section"><div class="container"><h2 class="center">{esc(C.H[lang]["adv"])}</h2><div class="adv-grid">{cards}</div></div></section>'
 
 def steps(lang):
+    # numbered zigzag rows with photos (moodboard note 4)
     items = "".join(
-        f'<li class="reveal"><span class="step-num">{i+1}</span><h3>{esc(t)}</h3><p>{esc(p)}</p></li>'
+        f'<li class="reveal"><div class="step-media">{media_placeholder(lang)}</div>'
+        f'<div class="step-body"><span class="step-num">0{i+1}</span><h3>{esc(t)}</h3><p>{esc(p)}</p></div></li>'
         for i, (t, p) in enumerate(C.STEPS[lang]))
-    return f'<section class="how section"><div class="container"><h2 class="center">{esc(C.H[lang]["how"])}</h2><ol class="steps">{items}</ol></div></section>'
+    return f'<section class="how section"><div class="container"><h2 class="center">{esc(C.H[lang]["how"])}</h2><ol class="steps-flow">{items}</ol></div></section>'
 
 def size_cards(lang, heading=True):
     u = C.UI[lang]
-    heights = {"1": 6, "2": 10, "3": 18, "4": 26, "5": 42}
+    # isometric box height per size (moodboard note 7: show scale visually)
+    heights = {"1": 8, "2": 13, "3": 24, "4": 36, "5": 58}
     cards = []
     for b in C.BOX_DATA:
         pop = b.get("popular")
         badge = f'<span class="pop-badge">{esc(u["popular"])}</span>' if pop else ""
         btn = "btn-gold" if pop else "btn-outline"
         cards.append(f"""<article class="size-card{' popular' if pop else ''} reveal">{badge}
-  <div class="size-visual"><div class="size-slot" style="--h:{heights[b['nr']]}px"></div></div>
+  <div class="size-visual">{safe_svg(heights[b['nr']])}</div>
   <h3>Nr. {b['nr']}</h3><p class="dims">{esc(b['dim'])}</p>
   <p class="fits">{esc(C.FITS[lang][b['nr']])}</p>
   <p class="price">{esc(u['from'])} <strong>{esc(b['m12'])}</strong>{esc(u['permonth'])}</p>
@@ -313,19 +365,20 @@ def size_table(lang):
 def security_block(lang, full=False):
     pts = C.SECPOINTS[lang]
     items = "".join(f'<li class="reveal">{esc(p)}</li>' for p in pts)
-    photo = f"""<div class="security-photo reveal"><div class="photo-placeholder">
-      <svg viewBox="0 0 24 24" width="44" height="44"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m3 17 5-5 4 4 3-3 6 6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
-      <p>{ {'lv':'Šeit: reāls glabātavas foto — bez stoka attēliem.','ru':'Здесь: реальное фото хранилища — без стоковых изображений.','en':'A real vault photo goes here — no stock images.'}[lang] }</p></div></div>"""
+    # a video will live here (moodboard note 5)
+    video = f'<div class="security-video reveal">{media_placeholder(lang, "video")}</div>'
     return f"""<section class="security section{'' if full else ' section-alt'}"><div class="container security-inner">
   <div class="security-text"><h2>{esc(C.H[lang]['security'])}</h2><ul class="sec-list">{items}</ul></div>
-  {photo}</div></section>"""
+  {video}</div></section>"""
 
 def trust_block(lang):
-    cards = "".join(f'<div class="trust-fact reveal"><strong>{esc(t)}</strong><p>{esc(p)}</p></div>' for t, p in C.TRUST[lang])
-    note = {'lv':'Šeit tiks ievietotas reālas Google atsauksmes.','ru':'Здесь будут реальные отзывы из Google.','en':'Real Google reviews will be embedded here.'}[lang]
+    # photo cards; no reviews block — there are none (moodboard note 6)
+    cards = "".join(
+        f'<div class="trust-fact reveal"><div class="trust-photo">{media_placeholder(lang)}</div>'
+        f'<div class="trust-body"><strong>{esc(t)}</strong><p>{esc(p)}</p></div></div>'
+        for t, p in C.TRUST[lang])
     return f"""<section class="trust section"><div class="container"><h2 class="center">{esc(C.H[lang]['trust'])}</h2>
-  <div class="trust-grid">{cards}</div>
-  <div class="reviews-placeholder reveal"><p>{esc(note)}</p></div></div></section>"""
+  <div class="trust-grid">{cards}</div></div></section>"""
 
 def location_block(lang, heading=True):
     u = C.UI[lang]
@@ -401,23 +454,16 @@ def hero(lang):
     u = C.UI[lang]
     stats = "".join(f'<li><strong>{esc(v)}</strong><span>{esc(l)}</span></li>' for v, l in he["stats"])
     return f"""<section class="hero">
-  <div class="hero-bg" aria-hidden="true"><div class="vault-illustration"><svg viewBox="0 0 400 400" aria-hidden="true">
-    <circle cx="200" cy="200" r="190" fill="none" stroke="rgba(201,164,92,.25)" stroke-width="2"/>
-    <circle cx="200" cy="200" r="150" fill="none" stroke="rgba(201,164,92,.45)" stroke-width="10"/>
-    <circle cx="200" cy="200" r="110" fill="none" stroke="rgba(201,164,92,.30)" stroke-width="3"/>
-    <circle cx="200" cy="200" r="46" fill="none" stroke="rgba(201,164,92,.6)" stroke-width="6"/>
-    <g stroke="rgba(201,164,92,.55)" stroke-width="6" stroke-linecap="round">
-      <line x1="200" y1="118" x2="200" y2="154"/><line x1="200" y1="246" x2="200" y2="282"/>
-      <line x1="118" y1="200" x2="154" y2="200"/><line x1="246" y1="200" x2="282" y2="200"/>
-      <line x1="143" y1="143" x2="168" y2="168"/><line x1="232" y1="232" x2="257" y2="257"/>
-      <line x1="257" y1="143" x2="232" y2="168"/><line x1="168" y1="232" x2="143" y2="257"/></g></svg></div></div>
-  <div class="container hero-inner">
-    <p class="hero-eyebrow">{esc(he['eyebrow'])}</p>
-    <h1>{esc(he['title'])}</h1>
-    <p class="hero-sub">{esc(he['sub'])}</p>
-    <div class="hero-ctas"><a class="btn btn-gold" href="#book">{esc(u['cta_book'])}</a><a class="btn btn-ghost" href="{link('boxes')}">{esc(u['cta_prices'])}</a></div>
-    <ul class="hero-stats">{stats}</ul>
-  </div></section>"""
+  <div class="container hero-grid">
+    <div class="hero-inner">
+      <p class="hero-eyebrow">{esc(he['eyebrow'])}</p>
+      <h1>{esc(he['title'])}</h1>
+      <p class="hero-sub">{esc(he['sub'])}</p>
+      <div class="hero-ctas"><a class="btn btn-gold" href="#book">{esc(u['cta_book'])}</a><a class="btn btn-navy" href="{link('boxes')}">{esc(u['cta_prices'])}</a></div>
+    </div>
+    <div class="hero-media">{media_placeholder(lang, 'hero')}</div>
+  </div></section>
+<div class="stat-band"><div class="container"><ul>{stats}</ul></div></div>"""
 
 def body_index(lang):
     return hero(lang) + advantages(lang) + size_cards(lang) + steps(lang) + security_block(lang) + trust_block(lang) + location_block(lang) + faq_accordion(lang, limit=5) + book_section(lang)

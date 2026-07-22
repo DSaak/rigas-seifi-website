@@ -9,8 +9,17 @@ content.py     All copy (LV/RU/EN), prices, SEO meta, FAQ — edit text here.
 build.py       Generator: templates + logic. Run it to (re)build the site.
 assets/        styles.css, app.js, images (shared, copied into docs/).
 docs/          GENERATED output — do not edit by hand. This is what you deploy.
+design/        Designer deliverables (A17 Digital moodboard PDF).
 snapshot.sh    Save a version snapshot (keeps the last 15).
 ```
+
+## Design system (from the A17 Digital moodboard, v1.0)
+Light theme: cream `#F8F6F1` page, deep navy `#0F2044` header/CTA sections,
+footer `#2D3748`, gold `#C9A84C` accents only (≤10% of screen), borders
+`#E2DED6`. Headings: Playfair Display (fallback Palatino/Georgia), weight 500.
+Body/nav/buttons: Inter. Buttons radius 4–6px, cards 8–12px, sections
+80–120px. No red accents, no pure white, max 2 fonts, prices always open.
+All tokens are CSS variables at the top of `assets/styles.css`.
 
 ## Build
 ```
@@ -44,10 +53,12 @@ Run `sh snapshot.sh "label"` after a round of changes. Snapshots live in
 15 most recent. `docs/` and caches are excluded from snapshots (regenerable).
 
 ## Still TODO before launch
-- Real photos (replace placeholders; shot list in the original TZ §6.2).
+- Real photos (replace dashed placeholders: hero, Why-us cards, How-it-works
+  steps, trust cards; shot list in the original TZ §6.2).
+- Security video (placeholder with play button on home/security pages).
 - Wire the booking form to a real endpoint (email + Telegram/WhatsApp) and a
   `/thank-you` page for GA4 conversion tracking. Hook noted in app.js.
-- Real Google reviews embed (placeholder on home/security).
 - Privacy & cookie policy page content; connect GA4/GTM + Meta Pixel after consent.
 - Native-speaker proofread of LV and RU copy.
 - Blog: write the article pages (titles drafted in content.py).
+(Reviews section dropped per designer's note — no reviews exist.)
