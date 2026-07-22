@@ -4,7 +4,7 @@
 #   Usage: sh snapshot.sh "short_label"
 set -e
 SRC="/Users/ds/Claude/Rigas Seifi Website"
-VROOT="/Users/ds/Claude/Rigas Seifi Website - versions"
+VROOT="/Users/ds/Claude/Rigas Seifi Website/versions"
 LABEL="${1:-update}"
 mkdir -p "$VROOT"
 
@@ -15,7 +15,7 @@ STAMP=$(date +%Y%m%d-%H%M)
 DEST="$VROOT/v${NEXT}_${LABEL}_${STAMP}"
 
 mkdir -p "$DEST"
-( cd "$SRC" && rsync -a --exclude docs --exclude __pycache__ --exclude '.DS_Store' ./ "$DEST/" )
+( cd "$SRC" && rsync -a --exclude docs --exclude versions --exclude __pycache__ --exclude '.DS_Store' ./ "$DEST/" )
 
 # keep only the 15 newest snapshots
 ( cd "$VROOT" && ls -1dt */ 2>/dev/null | tail -n +16 | while read d; do rm -rf "$d"; done )

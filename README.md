@@ -40,7 +40,7 @@ the text. Rebuild/publish after editing.
 
 ## Versioning
 Run `sh snapshot.sh "label"` after a round of changes. Snapshots live in
-`../Rigas Seifi Website - versions/` and the script auto-prunes to the
+`versions/` and the script auto-prunes to the
 15 most recent. `docs/` and caches are excluded from snapshots (regenerable).
 
 ## Still TODO before launch
