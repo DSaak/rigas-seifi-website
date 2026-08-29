@@ -377,6 +377,50 @@ TRUST = {
     },
 }
 
+# =====================================================================
+#  PHOTOS  —  slot -> file in assets/img/photos/ + alt text per language.
+#  PLACEHOLDERS: these are 400px previews of the OLD premises (the ones
+#  used before the 2026 move to Kaļķu iela 26),
+#  pulled from the archive shoot. They stand in so the layout can be judged
+#  with real pictures in it. Replace with full-resolution shots of the
+#  current vault before launch; drop a slot from this dict and that panel
+#  falls back to the "photo goes here" panel automatically.
+# =====================================================================
+PHOTOS = {
+    "hero": {"file": "vault-corridor.jpg",
+             "lv": "Seifu glabātavas eja ar seifu rindām",
+             "ru": "Проход в хранилище с рядами сейфовых ячеек",
+             "en": "Vault aisle lined with safe deposit boxes"},
+    "security_video": {"file": "vault-door.jpg",
+             "lv": "Rosengrens bruņotās glabātavas durvis",
+             "ru": "Бронированная дверь хранилища Rosengrens",
+             "en": "Rosengrens armoured vault door"},
+    "step1": {"file": "box-sizes.jpg",
+             "lv": "Pieci seifu izmēri blakus salīdzinājumam",
+             "ru": "Пять размеров сейфовых ячеек рядом для сравнения",
+             "en": "Five box sizes side by side for comparison"},
+    "step2": {"file": "meeting-room.jpg",
+             "lv": "Privāta kabīne dokumentu kārtošanai",
+             "ru": "Отдельная кабина для оформления документов",
+             "en": "A private booth for handling paperwork"},
+    "step3": {"file": "box-retrieval.jpg",
+             "lv": "Klients atslēdz savu seifu",
+             "ru": "Клиент открывает свою ячейку",
+             "en": "A client unlocking their own box"},
+    "about1": {"file": "vault-first.jpg",
+             "lv": "Glabātavas telpa ar seifu rindām",
+             "ru": "Помещение хранилища с рядами ячеек",
+             "en": "The vault room with its rows of boxes"},
+    # !! MISMATCH TO FIX: the caption for this slot says "the new premises at
+    # Kaļķu iela 26", but every photo available is of the OLD place. Swap in a
+    # real Kaļķu-26 shot, or delete this entry so the panel goes back to
+    # "photo goes here", before this ever goes live.
+    "about2": {"file": "vault-aisle.jpg",
+             "lv": "Seifu rindas glabātavā",
+             "ru": "Ряды ячеек в хранилище",
+             "en": "Rows of boxes inside the vault"},
+}
+
 # Partners (logo file in assets/img/, or None until the logo is supplied)
 PARTNERS = [
     {"name": "Money Express", "url": "https://www.moneyexpress.lv/", "logo": "partner-money-express.svg"},

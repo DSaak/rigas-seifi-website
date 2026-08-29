@@ -48,6 +48,21 @@ def canonical(lang, page):
 ASSET = "../assets"
 
 
+def _fingerprint(name):
+    """Short content hash appended to asset URLs. Without it, browsers keep
+    serving the previous styles.css/app.js after a deploy."""
+    import hashlib
+    path = os.path.join(ASSETS_SRC, name)
+    try:
+        with open(path, "rb") as f:
+            return hashlib.md5(f.read()).hexdigest()[:8]
+    except OSError:
+        return "0"
+
+def asset(name):
+    return f"{ASSET}/{name}?v={_fingerprint(name)}"
+
+
 # ---------- small inline icon set ----------
 ICONS = {
     "shield": '<path d="M12 2 4 5.5v5.1c0 5 3.4 9.6 8 10.9 4.6-1.3 8-5.9 8-10.9V5.5L12 2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m8.7 12 2.3 2.3 4.3-4.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -79,10 +94,19 @@ MEDIA_TXT = {
               "en": "Photo or video of the vault"},
 }
 
-def media_placeholder(lang, kind="photo", extra=""):
+def media_placeholder(lang, kind="photo", extra="", slot=None):
+    """A real photo when PHOTOS has one for this slot, otherwise the styled
+    'photo goes here' panel. Drop a slot from PHOTOS and the panel comes
+    back with no other edits."""
+    cls = " tall" if kind in ("video", "hero") else ""
+    photo = C.PHOTOS.get(slot) if slot else None
+    if photo:
+        play = PLAY_SVG if kind == "video" else ""
+        return (f'<div class="media-shot{cls}{extra}">'
+                f'<img src="{ASSET}/img/photos/{photo["file"]}" alt="{esc(photo[lang])}"'
+                f' loading="lazy" decoding="async">{play}</div>')
     ic = PLAY_SVG if kind == "video" else CAMERA_SVG
     txt = MEDIA_TXT[kind][lang]
-    cls = " tall" if kind in ("video", "hero") else ""
     return f'<div class="media-placeholder{cls}{extra}">{ic}<p>{esc(txt)}</p></div>'
 
 
@@ -157,7 +181,7 @@ def head(lang, page):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{ASSET}/styles.css">
+<link rel="stylesheet" href="{asset("styles.css")}">
 {schema_blocks(lang, page)}
 </head>
 <body>
@@ -260,6 +284,7 @@ def header(lang, current):
     <div class="mobile-lang lang-switch" role="group" aria-label="Language">{langs}</div>
     <a class="btn btn-gold btn-full" href="#book">{esc(u['book'])}</a>
   </nav>
+  <div class="scroll-progress" aria-hidden="true"><i id="scrollProgress"></i></div>
 </header>
 <main>
 """
@@ -305,7 +330,7 @@ def footer(lang):
     <button class="btn btn-outline btn-sm" id="cookieDecline">{esc(u['cookie_decline'])}</button>
   </div>
 </div>
-<script src="{ASSET}/app.js"></script>
+<script src="{asset("app.js")}"></script>
 </body>
 </html>"""
 
@@ -323,13 +348,15 @@ def page_hero(lang, title, sub=""):
     sub_html = f'<p class="page-hero-sub">{esc(sub)}</p>' if sub else ""
     return f"""<section class="page-hero"><div class="container"><h1>{esc(title)}</h1>{sub_html}</div></section>"""
 
-def steps(lang, alt=False):
+def steps(lang, alt=False, heading=True):
     # numbered zigzag rows with photos (moodboard note 4)
     items = "".join(
-        f'<li class="reveal"><div class="step-media">{media_placeholder(lang)}</div>'
+        f'<li class="reveal"><div class="step-media">{media_placeholder(lang, slot=f"step{i+1}")}</div>'
         f'<div class="step-body"><span class="step-num">0{i+1}</span><h3>{esc(t)}</h3><p>{esc(p)}</p></div></li>'
         for i, (t, p) in enumerate(C.STEPS[lang]))
-    return f'<section class="how section{" section-alt" if alt else ""}"><div class="container"><h2 class="center">{esc(C.H[lang]["how"])}</h2><ol class="steps-flow">{items}</ol></div></section>'
+    rail = '<span class="steps-rail" aria-hidden="true"><i></i></span>' 
+    h2 = f'<h2 class="center">{esc(C.H[lang]["how"])}</h2>' if heading else ""
+    return f'<section class="how section{" section-alt" if alt else ""}"><div class="container">{h2}<div class="steps-wrap">{rail}<ol class="steps-flow">{items}</ol></div></div></section>'
 
 def size_cards(lang, heading=True):
     u = C.UI[lang]
@@ -340,7 +367,7 @@ def size_cards(lang, heading=True):
         pop = b.get("popular")
         badge = f'<span class="pop-badge">{esc(u["popular"])}</span>' if pop else ""
         btn = "btn-gold" if pop else "btn-outline"
-        cards.append(f"""<article class="size-card{' popular' if pop else ''} reveal">{badge}
+        cards.append(f"""<article class="size-card{' popular' if pop else ''} reveal" style="--i:{len(cards)}">{badge}
   <div class="size-visual">{safe_svg(heights[b['nr']])}</div>
   <h3>Nr. {b['nr']}</h3><p class="dims">{esc(b['dim'])}</p>
   <p class="fits">{esc(C.FITS[lang][b['nr']])}</p>
@@ -370,15 +397,16 @@ def security_block(lang, full=False, alt=False):
     groups = ""
     for gi, (title, points) in enumerate(C.SECGROUPS[lang]):
         if full and gi == 1:
-            rows = "".join(f'<div class="lock-row"><strong>{esc(t)}</strong><p>{esc(d)}</p></div>'
-                           for t, d in C.SECLOCKS[lang])
+            rows = "".join(f'<div class="lock-row" style="--i:{i}"><strong>{esc(t)}</strong><p>{esc(d)}</p></div>'
+                           for i, (t, d) in enumerate(C.SECLOCKS[lang]))
             groups += (f'<div class="sec-group reveal"><h3>{esc(title)}</h3>'
                        f'<div class="lock-rows">{rows}</div></div>')
         else:
+            lis = "".join('<li style="--i:%d">%s</li>' % (i, mb(p)) for i, p in enumerate(points))
             groups += (f'<div class="sec-group reveal"><h3>{esc(title)}</h3>'
-                       f'<ul class="sec-list">{"".join(f"<li>{mb(p)}</li>" for p in points)}</ul></div>')
+                       f'<ul class="sec-list">{lis}</ul></div>')
     # a video will live here (moodboard note 5)
-    video = f'<div class="security-video reveal">{media_placeholder(lang, "video")}</div>'
+    video = f'<div class="security-video reveal">{media_placeholder(lang, "video", slot="security_video")}</div>'
     return f"""<section class="security section{' section-alt' if alt else ''}"><div class="container security-inner">
   <div class="security-text">{'' if full else f"<h2>{esc(C.H[lang]['security'])}</h2>"}{groups}
     <p class="sec-certs">{esc(C.CERTS[lang])}</p></div>
@@ -388,9 +416,11 @@ def trust_block(lang, alt=False):
     # "why clients choose us": intro + icon cards (no reviews — there are none)
     t = C.TRUST[lang]
     cards = "".join(
-        f'<article class="trust-fact reveal"><div class="adv-icon">{icon(ic)}</div>'
+        f'<article class="trust-fact reveal{" feature" if i == 0 else ""}" style="--i:{i}">'
+        f'<span class="card-num" aria-hidden="true">{i + 1:02d}</span>'
+        f'<div class="adv-icon">{icon(ic)}</div>'
         f'<strong>{esc(title)}</strong><p>{esc(body)}</p></article>'
-        for ic, title, body in t["cards"])
+        for i, (ic, title, body) in enumerate(t["cards"]))
     return f"""<section class="trust section{' section-alt' if alt else ''}"><div class="container"><h2 class="center">{esc(C.H[lang]['trust'])}</h2>
   <p class="section-sub center">{esc(t['intro'])}</p>
   <div class="trust-grid">{cards}</div></div></section>"""
@@ -417,7 +447,7 @@ def extras_table(lang, alt=True):
 
 def dealbox_block(lang, alt=False):
     lbl = C.DEALBOX_STEP[lang]
-    rows = "".join(f'<li class="reveal"><span class="deal-num">{esc(lbl)} {i+1}</span><p>{esc(t)}</p></li>'
+    rows = "".join(f'<li class="reveal" style="--i:{i}"><span class="deal-num">{esc(lbl)} {i+1}</span><p>{esc(t)}</p></li>'
                    for i, t in enumerate(C.DEALBOX[lang]))
     return f"""<section class="section{' section-alt' if alt else ''}" id="deal-box"><div class="container narrow">
   <h2 class="center">{esc(C.H[lang]['dealbox'])}</h2>
@@ -454,13 +484,16 @@ def location_block(lang, heading=True, alt=True):
     <div class="location-map reveal"><iframe title="Map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q={S['maps_q']}&output=embed"></iframe></div>
   </div></div></section>"""
 
-def faq_accordion(lang, limit=None, alt=False):
+def faq_accordion(lang, limit=None, alt=False, heading=True):
     items = C.FAQ[lang][:limit] if limit else C.FAQ[lang]
-    rows = "".join(f'<details class="reveal"><summary>{esc(q)}</summary><p>{esc(a)}</p></details>' for q, a in items)
+    rows = "".join(f'<details class="reveal" style="--i:{i}"><summary>{esc(q)}</summary>'
+                   f'<div class="faq-body"><p>{esc(a)}</p></div></details>'
+                   for i, (q, a) in enumerate(items))
     more = ""
     if limit:
         more = f'<p class="center" style="margin-top:1.4rem"><a class="btn btn-outline" href="{link("faq")}">{esc(C.UI[lang]["cta_more"])}</a></p>'
-    return f'<section class="faq section{" section-alt" if alt else ""}" id="faq"><div class="container faq-container"><h2 class="center">{esc(C.H[lang]["faq"])}</h2><div class="faq-list">{rows}</div>{more}</div></section>'
+    h2 = f'<h2 class="center">{esc(C.H[lang]["faq"])}</h2>' if heading else ""
+    return f'<section class="faq section{" section-alt" if alt else ""}" id="faq"><div class="container faq-container">{h2}<div class="faq-list">{rows}</div>{more}</div></section>'
 
 def booking_form(lang):
     u = C.UI[lang]
@@ -508,16 +541,17 @@ def book_section(lang):
 def hero(lang):
     he = C.HERO[lang]
     u = C.UI[lang]
-    stats = "".join(f'<li><strong>{esc(v)}</strong><span>{esc(l)}</span></li>' for v, l in he["stats"])
+    stats = "".join(f'<li style="--i:{i}"><strong data-count>{esc(v)}</strong><span>{esc(l)}</span></li>'
+                    for i, (v, l) in enumerate(he["stats"]))
     return f"""<section class="hero">
   <div class="container hero-grid">
     <div class="hero-inner">
-      <p class="hero-eyebrow">{esc(he['eyebrow'])}</p>
-      <h1>{esc(he['title'])}</h1>
-      <p class="hero-sub">{esc(he['sub'])}</p>
-      <div class="hero-ctas"><a class="btn btn-gold" href="#book">{esc(u['cta_book'])}</a><a class="btn btn-navy" href="{link('boxes')}">{esc(u['cta_prices'])}</a></div>
+      <p class="hero-eyebrow anim" style="--d:0">{esc(he['eyebrow'])}</p>
+      <h1 class="anim" style="--d:1">{esc(he['title'])}</h1>
+      <p class="hero-sub anim" style="--d:2">{esc(he['sub'])}</p>
+      <div class="hero-ctas anim" style="--d:3"><a class="btn btn-gold" href="#book">{esc(u['cta_book'])}</a><a class="btn btn-navy" href="{link('boxes')}">{esc(u['cta_prices'])}</a></div>
     </div>
-    <div class="hero-media">{media_placeholder(lang, 'hero')}</div>
+    <div class="hero-media anim" style="--d:2" data-parallax="0.05">{media_placeholder(lang, 'hero', slot='hero')}</div>
   </div></section>
 <div class="stat-band"><div class="container"><ul>{stats}</ul></div></div>"""
 
@@ -541,20 +575,24 @@ def body_security(lang):
 def body_how(lang):
     x = C.HOWX[lang]
     cols = ""
-    for t_key, l_key in [("need_t", "need"), ("pay_t", "pay"), ("access_t", "access")]:
+    for n, (t_key, l_key) in enumerate([("need_t", "need"), ("pay_t", "pay"), ("access_t", "access")]):
         lis = "".join(f"<li>{esc(i)}</li>" for i in x[l_key])
-        cols += f'<div class="info-card reveal"><h3>{esc(x[t_key])}</h3><ul class="check-list">{lis}</ul></div>'
+        cols += (f'<div class="info-card reveal" style="--i:{n}"><h3>{esc(x[t_key])}</h3>'
+                 f'<ul class="check-list">{lis}</ul></div>')
     sub = {'lv':'No izvēles līdz drošai glabāšanai — trijos soļos.','ru':'От выбора до надёжного хранения — за три шага.','en':'From choice to safe storage — in three steps.'}[lang]
     extra = f'<section class="section section-alt"><div class="container"><div class="info-grid">{cols}</div></div></section>'
-    return breadcrumb(lang, "how") + page_hero(lang, C.H[lang]["how"], sub) + steps(lang) + extra + book_section(lang)
+    return (breadcrumb(lang, "how") + page_hero(lang, C.H[lang]["how"], sub)
+            + steps(lang, heading=False) + extra + book_section(lang))
 
 def body_services(lang):
     u = C.UI[lang]
     more = (f'<a class="btn btn-outline btn-sm service-more" target="_blank" rel="noopener" '
             f'href="{esc(wa_href(lang))}" data-track="whatsapp_click">{esc(u["cta_more"])}</a>')
     cards = "".join(
-        f'<article class="service-card reveal"><div class="adv-icon">{icon(ic)}</div><h3>{esc(t)}</h3><p>{esc(b)}</p>{more}</article>'
-        for ic, t, b in C.SERVICES[lang])
+        f'<article class="service-card reveal" style="--i:{i}">'
+        f'<span class="card-num" aria-hidden="true">{i + 1:02d}</span>'
+        f'<div class="adv-icon">{icon(ic)}</div><h3>{esc(t)}</h3><p>{esc(b)}</p>{more}</article>'
+        for i, (ic, t, b) in enumerate(C.SERVICES[lang]))
     sub = {'lv':'Vairāk nekā seifu noma.','ru':'Больше, чем аренда сейфа.','en':'More than safe deposit rental.'}[lang]
     grid = f'<section class="section"><div class="container"><div class="service-grid">{cards}</div></div></section>'
     return (breadcrumb(lang, "services") + page_hero(lang, C.H[lang]["services"], sub) + grid
@@ -563,19 +601,21 @@ def body_services(lang):
 def body_about(lang):
     a = C.ABOUT[lang]
     paras = "".join(f"<p>{esc(p)}</p>" for p in a["paras"])
-    facts = "".join(f'<div class="trust-fact reveal"><strong>{esc(v)}</strong><p>{esc(l)}</p></div>' for v, l in a["facts"])
+    facts = "".join(f'<div class="fact" style="--i:{i}"><strong data-count>{esc(v)}</strong><p>{esc(l)}</p></div>'
+                    for i, (v, l) in enumerate(a["facts"]))
     sub = a["lead"]
-    shots = "".join(f'<figure class="about-shot reveal">{media_placeholder(lang)}'
-                    f'<figcaption>{esc(c)}</figcaption></figure>' for c in a["photos"])
+    shots = "".join(f'<figure class="about-shot reveal">{media_placeholder(lang, slot=f"about{n+1}")}'
+                    f'<figcaption>{esc(c)}</figcaption></figure>' for n, c in enumerate(a["photos"]))
     content_sec = f"""<section class="section"><div class="container narrow">{paras}</div></section>
-<section class="section section-alt"><div class="container"><div class="trust-grid">{facts}</div></div></section>
+<section class="section section-alt"><div class="container"><div class="fact-band reveal">{facts}</div></div></section>
 <section class="section"><div class="container"><div class="about-shots">{shots}</div></div></section>"""
     return (breadcrumb(lang, "about") + page_hero(lang, C.UI[lang]["nav"]["about"], sub) + content_sec
             + partners_block(lang) + book_section(lang))
 
 def body_faq(lang):
     sub = {'lv':'Viss, kas jāzina pirms seifa nomas.','ru':'Всё, что нужно знать перед арендой сейфа.','en':'Everything to know before renting a box.'}[lang]
-    return breadcrumb(lang, "faq") + page_hero(lang, C.H[lang]["faq"], sub) + faq_accordion(lang) + book_section(lang)
+    return (breadcrumb(lang, "faq") + page_hero(lang, C.H[lang]["faq"], sub)
+            + faq_accordion(lang, heading=False) + book_section(lang))
 
 def body_contacts(lang):
     sub = {'lv':'Sazinieties ar mums vai rezervējiet seifu tiešsaistē.','ru':'Свяжитесь с нами или забронируйте сейф онлайн.','en':'Get in touch or book your box online.'}[lang]
@@ -584,8 +624,8 @@ def body_contacts(lang):
 def body_blog(lang):
     bl = C.BLOG[lang]
     cards = "".join(
-        f'<article class="blog-card reveal"><span class="blog-soon">{esc(bl["soon"])}</span><h3>{esc(t)}</h3></article>'
-        for t in bl["posts"])
+        f'<article class="blog-card reveal" style="--i:{i}"><span class="blog-soon">{esc(bl["soon"])}</span><h3>{esc(t)}</h3></article>'
+        for i, t in enumerate(bl["posts"]))
     sub = bl["intro"]
     grid = f'<section class="section"><div class="container"><div class="blog-grid">{cards}</div></div></section>'
     return breadcrumb(lang, "blog") + page_hero(lang, C.UI[lang]["nav"].get("blog", "Blog"), sub) + grid + book_section(lang)

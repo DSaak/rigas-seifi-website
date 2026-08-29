@@ -569,3 +569,352 @@ h2.center, .section-sub.center { margin-left: auto; margin-right: auto; }
   .reveal { opacity: 1; transform: none; transition: none; }
   html { scroll-behavior: auto; }
 }
+
+/* =====================================================================
+   MODERNISATION LAYER (2026)
+   Same palette, same copy, same section order — different craft.
+   The goal is to remove the "one centred heading over a row of identical
+   rounded boxes" rhythm that repeated in six sections, and to give the
+   page motion that responds to the reader instead of one blanket fade.
+   Loaded last so it wins the cascade; nothing above needed deleting.
+   ===================================================================== */
+:root {
+  /* layered elevation reads as real depth; one soft blob does not */
+  --e1: 0 1px 2px rgba(15,32,68,.06), 0 2px 8px rgba(15,32,68,.05);
+  --e2: 0 2px 4px rgba(15,32,68,.06), 0 12px 28px rgba(15,32,68,.10);
+  --e3: 0 4px 8px rgba(15,32,68,.08), 0 24px 56px rgba(15,32,68,.14);
+  --ease: cubic-bezier(.22,.61,.36,1);
+  --ease-out: cubic-bezier(.16,1,.3,1);
+  --section-y-lg: clamp(4.5rem, 8vw, 7rem);
+  --gold-line: linear-gradient(90deg, transparent, var(--gold), transparent);
+  /* film grain — kills the flat-vector look on the navy blocks */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E");
+}
+
+/* ---------- Type: fluid, tighter, better measure ---------- */
+h1 { font-size: clamp(2.4rem, 4.6vw, 3.85rem); letter-spacing: -0.022em; line-height: 1.08; }
+h2 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); letter-spacing: -0.015em; line-height: 1.14; }
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+.hero-sub { font-size: clamp(1.08rem, 1.5vw, 1.22rem); line-height: 1.6; }
+strong, b { font-variant-numeric: tabular-nums; }
+
+/* A hairline gold rule above every section heading. One small, consistent
+   signal of hierarchy does more than centring everything. */
+.section > .container > h2.center::before,
+.partners .container > h2.center::before {
+  content: ""; display: block; width: 46px; height: 2px; margin: 0 auto 1.25rem;
+  background: var(--gold); border-radius: 2px;
+}
+.security-text h2::before, .page-hero h1::before { content: none; }
+
+/* ---------- Motion primitives ---------- */
+.reveal { opacity: 0; transform: translateY(22px); filter: blur(3px);
+  transition: opacity .7s var(--ease-out), transform .7s var(--ease-out), filter .7s var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 70ms); }
+.reveal.in { opacity: 1; transform: none; filter: none; }
+/* hero runs on load, not on scroll */
+.anim { opacity: 0; transform: translateY(16px);
+  animation: rise .85s var(--ease-out) forwards; animation-delay: calc(var(--d, 0) * 110ms + 120ms); }
+@keyframes rise { to { opacity: 1; transform: none; } }
+
+/* ---------- Header: condenses and turns to glass on scroll ---------- */
+.site-header { transition: background .3s var(--ease), box-shadow .3s var(--ease); }
+.site-header .header-inner { transition: min-height .3s var(--ease); }
+.site-header.stuck { background: rgba(15,32,68,.86); backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px); box-shadow: var(--e2); }
+.site-header.stuck .header-inner { min-height: 60px; }
+.header-nav a { position: relative; }
+.header-nav a::after { content: ""; position: absolute; left: 0; right: 100%; bottom: -6px; height: 1.5px;
+  background: var(--gold); transition: right .32s var(--ease-out); }
+.header-nav a:hover::after, .header-nav a.active::after { right: 0; }
+
+/* Header fit. The desktop nav used to switch on at 900px, but six Russian
+   labels + phone + language switch + a 160px CTA do not fit until ~1120px,
+   so every width in between put a horizontal scrollbar on the whole page
+   (1024 overflowed by 52px, 900 by 176px). Hold the hamburger longer, then
+   run a tightened header until there is room for the roomy one. */
+@media (min-width: 900px) and (max-width: 1119px) {
+  .header-nav { display: none; }
+  .nav-toggle { display: flex; }
+  .header-phone { display: none; }
+  .phone-icon { display: grid; }
+  .header-actions .lang-switch { display: none; }
+  .header-actions > .btn { display: none; }
+}
+@media (min-width: 1120px) and (max-width: 1299px) {
+  .header-nav { gap: 1.05rem; margin-left: 1.1rem; }
+  .header-nav a { font-size: .88rem; }
+  .header-phone { display: none; }
+  .phone-icon { display: grid; }
+  .header-actions { gap: .6rem; }
+  .header-actions .btn { min-width: 0; padding: 12px 18px; }
+}
+
+/* reading progress, hairline, under the header */
+.scroll-progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: transparent; }
+.scroll-progress i { display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold)); }
+
+/* ---------- Hero: warm wash + parallax media ---------- */
+.hero { position: relative; padding: var(--section-y-lg) 0 var(--section-y); overflow: hidden; }
+.hero::before { content: ""; position: absolute; inset: -20% -10% auto -30%; height: 130%;
+  background: radial-gradient(58% 62% at 22% 32%, rgba(201,168,76,.13), transparent 68%),
+              radial-gradient(46% 52% at 88% 8%, rgba(27,58,107,.10), transparent 70%);
+  pointer-events: none; }
+.hero > .container { position: relative; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: .6rem; }
+.hero-eyebrow::before { content: ""; width: 26px; height: 1.5px; background: var(--gold); }
+.hero-media { will-change: transform; }
+
+/* ---------- Media panels: designed slots, not dashed to-do boxes ---------- */
+.media-placeholder {
+  position: relative; border: 0; border-radius: 14px; overflow: hidden;
+  background: linear-gradient(150deg, #16294f 0%, var(--navy) 46%, #0b1832 100%);
+  color: rgba(255,255,255,.62); box-shadow: var(--e2); min-height: 260px;
+}
+.media-placeholder::before { content: ""; position: absolute; inset: 0;
+  background-image: var(--grain); opacity: .1; mix-blend-mode: overlay; pointer-events: none; }
+.media-placeholder::after { content: ""; position: absolute; inset: 0;
+  background: radial-gradient(42% 46% at 50% 38%, rgba(201,168,76,.20), transparent 72%); pointer-events: none; }
+.media-placeholder svg, .media-placeholder p { position: relative; z-index: 1; }
+.media-placeholder svg { color: var(--gold); opacity: .85; }
+.media-placeholder.tall { min-height: 400px; }
+.step-media .media-placeholder { min-height: 230px; }
+.play-badge { background: rgba(255,255,255,.1); backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,.22); transition: transform .3s var(--ease-out); }
+.security-video:hover .play-badge { transform: scale(1.08); }
+
+/* ---------- Real photos (.media-shot) ----------
+   Same box as the placeholder panel it replaces, so nothing reflows when a
+   slot is filled. object-fit:cover keeps portrait and landscape originals
+   filling the same frame. */
+.media-shot {
+  position: relative; border-radius: 14px; overflow: hidden;
+  background: var(--navy); box-shadow: var(--e2);
+  /* a FIXED height, not min-height: a portrait original with height:100%
+     would otherwise stretch the box to its own aspect ratio */
+  height: 260px;
+}
+.media-shot img { position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: center; display: block; }
+.media-shot.tall { height: 400px; }
+.step-media .media-shot { height: 230px; }
+.about-shot .media-shot { height: 300px; }
+@media (max-width: 599px) { .media-shot.tall { height: 300px; } }
+/* a hair of navy over the photo keeps it in the palette and stops bright
+   originals fighting the cream page */
+.media-shot::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(15,32,68,.10), rgba(15,32,68,.28));
+}
+.media-shot .play-badge {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  z-index: 1; background: rgba(15,32,68,.55); backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,.3); color: #fff;
+}
+.security-video:hover .media-shot .play-badge { transform: translate(-50%, -50%) scale(1.08); }
+.media-shot img { transition: transform .6s var(--ease-out); }
+.about-shot:hover .media-shot img, .step-media:hover .media-shot img { transform: scale(1.03); }
+@media (prefers-reduced-motion: reduce) {
+  .media-shot img, .security-video:hover .media-shot .play-badge { transition: none; transform: none; }
+  .media-shot .play-badge { transform: translate(-50%, -50%); }
+}
+
+/* ---------- Stat band: gradient, grain, counting numerals ---------- */
+.stat-band { position: relative; overflow: hidden;
+  background: linear-gradient(115deg, #0d1c3d, var(--navy) 55%, #16294f); }
+.stat-band::before { content: ""; position: absolute; inset: 0;
+  background-image: var(--grain); opacity: .09; mix-blend-mode: overlay; }
+.stat-band::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--gold-line); }
+.stat-band ul { position: relative; padding: 2.1rem 0; }
+.stat-band li { opacity: 0; transform: translateY(14px);
+  animation: rise .7s var(--ease-out) forwards; animation-delay: calc(var(--i) * 90ms + 380ms); }
+.stat-band strong { font-size: clamp(1.7rem, 2.6vw, 2.2rem); font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em; display: block; }
+.stat-band li + li { position: relative; }
+@media (min-width: 720px) { .stat-band li + li::before { content: ""; position: absolute; left: -1rem; top: .2rem; bottom: .2rem; width: 1px; background: rgba(255,255,255,.12); } }
+
+/* ---------- Cards: shared modern behaviour ---------- */
+.trust-fact, .service-card, .size-card, .info-card, .blog-card, .lock-row, .deal-steps li, details {
+  transition: transform .35s var(--ease-out), box-shadow .35s var(--ease-out), border-color .25s var(--ease);
+}
+.trust-fact, .service-card, .info-card, .blog-card { position: relative; overflow: hidden; box-shadow: var(--e1); }
+.trust-fact:hover, .service-card:hover, .info-card:hover, .blog-card:hover {
+  transform: translateY(-4px); box-shadow: var(--e2); border-color: rgba(201,168,76,.55);
+}
+.size-card:hover { transform: translateY(-6px); box-shadow: var(--e3); }
+/* ghost numeral — gives each card an identity instead of repeating a badge */
+.card-num {
+  position: absolute; top: .55rem; right: 1rem; z-index: 0;
+  font: 500 3.4rem var(--serif); line-height: 1; color: var(--navy); opacity: .07;
+  pointer-events: none; transition: opacity .35s var(--ease), transform .35s var(--ease-out);
+}
+.trust-fact:hover .card-num, .service-card:hover .card-num { opacity: .13; transform: translateY(-2px); }
+.trust-fact > *:not(.card-num), .service-card > *:not(.card-num) { position: relative; z-index: 1; }
+/* icons: line-art on a gold hairline circle, not a filled rounded square */
+.adv-icon { width: 46px; height: 46px; border-radius: 50%; background: transparent;
+  border: 1px solid rgba(201,168,76,.5); color: var(--gold-dark); margin-bottom: 1.15rem;
+  transition: background .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease); }
+.adv-icon svg { width: 22px; height: 22px; }
+.trust-fact:hover .adv-icon, .service-card:hover .adv-icon { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+
+/* ---------- "Why us": an editorial grid, not seven equal boxes ---------- */
+.trust-grid { display: grid; gap: 1.1rem; grid-template-columns: 1fr; }
+.trust-fact { max-width: none; padding: 1.7rem 1.7rem 1.9rem; background: #fff; }
+.trust .section-sub { max-width: 68ch; }
+/* On wide screens the section opens like an article: heading on the left,
+   the standfirst beside it. A centred heading stacked over a centred
+   four-line paragraph is the most template-looking shape on a page. */
+@media (min-width: 1000px) {
+  .trust > .container { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+    column-gap: 3.5rem; align-items: end; }
+  .trust h2.center { text-align: left; margin: 0 0 .2rem; grid-column: 1; }
+  .trust h2.center::before { margin-left: 0; margin-right: 0; }
+  .trust .section-sub { text-align: left; margin: 0; grid-column: 2; max-width: 58ch; }
+  .trust-grid { grid-column: 1 / -1; margin-top: var(--block-gap); }
+}
+.trust-fact.feature { background: linear-gradient(155deg, #16294f, var(--navy)); border-color: transparent; color: #fff; }
+.trust-fact.feature strong { color: #fff; }
+.trust-fact.feature p { color: rgba(255,255,255,.78); }
+.trust-fact.feature .card-num { color: var(--gold); opacity: .3; }
+.trust-fact.feature .adv-icon { border-color: rgba(201,168,76,.6); color: var(--gold); }
+.trust-fact.feature:hover .adv-icon { background: var(--gold); color: var(--navy); }
+@media (min-width: 700px) { .trust-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1000px) {
+  .trust-grid { grid-template-columns: repeat(6, 1fr); }
+  /* 3+3 / 2+2+2 / 3+3 — the rhythm changes down the section */
+  .trust-fact:nth-child(1), .trust-fact:nth-child(2) { grid-column: span 3; }
+  .trust-fact:nth-child(3), .trust-fact:nth-child(4), .trust-fact:nth-child(5) { grid-column: span 2; }
+  .trust-fact:nth-child(6), .trust-fact:nth-child(7) { grid-column: span 3; }
+  .trust-fact.feature strong { font-size: 1.75rem; }
+  .trust-fact.feature { padding: 2.2rem 2.2rem 2.4rem; }
+}
+
+/* ---------- Services: same asymmetry, and the CTA settles on hover ---------- */
+@media (min-width: 1000px) {
+  .service-grid { grid-template-columns: repeat(6, 1fr); }
+  .service-card:nth-child(-n+3) { grid-column: span 2; }
+  .service-card:nth-child(n+4) { grid-column: span 3; }
+}
+.service-more { opacity: .55; transform: translateY(2px);
+  transition: opacity .3s var(--ease), transform .3s var(--ease-out), border-color .2s var(--ease), color .2s var(--ease); }
+.service-card:hover .service-more { opacity: 1; transform: none; border-color: var(--gold); color: var(--gold-dark); }
+
+/* ---------- Size cards: the safe reacts, the price is the anchor ---------- */
+.size-card { background: linear-gradient(180deg, #fff, #fdfcfa); }
+.size-visual svg { transition: transform .4s var(--ease-out); transform-origin: 50% 90%; }
+.size-card:hover .size-visual svg { transform: translateY(-4px) scale(1.05); }
+.size-card.popular { box-shadow: 0 0 0 1.5px var(--gold), var(--e2); }
+.price strong { font-size: 1.75rem; font-variant-numeric: tabular-nums; }
+
+/* ---------- Steps: a rail that fills as you read ---------- */
+.steps-wrap { position: relative; }
+.steps-rail { display: none; }
+@media (min-width: 720px) {
+  .steps-rail { display: block; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+    transform: translateX(-50%); background: var(--border); border-radius: 2px; overflow: hidden; }
+  .steps-rail i { display: block; width: 100%; height: 0;
+    background: linear-gradient(180deg, var(--gold), var(--gold-dark)); transition: height .25s linear; }
+}
+.step-num { display: inline-flex; align-items: center; gap: .55rem; font-size: .78rem; letter-spacing: .16em; }
+.step-num::before { content: ""; width: 22px; height: 1.5px; background: var(--gold); }
+
+/* ---------- Security: the intro sticks while the specs scroll past ---------- */
+@media (min-width: 960px) {
+  .security-inner { align-items: start; }
+  .security .security-video { position: sticky; top: 104px; }
+}
+.sec-list li { transition: transform .3s var(--ease-out); }
+.sec-list li:hover { transform: translateX(3px); }
+.lock-row:hover { transform: translateX(4px); box-shadow: var(--e1); }
+
+/* ---------- Partners ----------
+   Deliberately still: the logo row does not scroll or auto-advance. */
+.partner-row { margin-top: var(--block-gap); gap: 1.4rem; }
+.partner { box-shadow: var(--e1); transition: border-color .25s var(--ease), box-shadow .3s var(--ease-out); }
+.partner:hover { border-color: rgba(201,168,76,.55); box-shadow: var(--e2); }
+
+/* ---------- FAQ: opens smoothly ----------
+   Native <details> animation. Browsers that don't support
+   ::details-content simply snap open, exactly as they do today. */
+:root { interpolate-size: allow-keywords; }
+details { box-shadow: var(--e1); }
+details[open] { border-color: rgba(201,168,76,.5); box-shadow: var(--e2); }
+details::details-content {
+  block-size: 0; overflow: hidden;
+  transition: block-size .32s var(--ease-out), content-visibility .32s allow-discrete;
+}
+details[open]::details-content { block-size: auto; }
+summary::after { transition: transform .3s var(--ease-out); }
+summary:hover { color: var(--gold-dark); }
+
+/* ---------- About: one counting band, not five more boxes ---------- */
+.fact-band { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.6rem 1rem;
+  background: linear-gradient(115deg, #0d1c3d, var(--navy) 58%, #16294f);
+  border-radius: 14px; padding: 2.2rem 1.6rem; position: relative; overflow: hidden; box-shadow: var(--e2); }
+.fact-band::before { content: ""; position: absolute; inset: 0; background-image: var(--grain);
+  opacity: .09; mix-blend-mode: overlay; }
+.fact { position: relative; text-align: center; }
+.fact strong { display: block; font: 500 clamp(1.6rem, 2.6vw, 2.2rem) var(--serif); color: var(--gold);
+  font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.fact p { color: rgba(255,255,255,.7); font-size: .84rem; margin-top: .2rem; }
+@media (min-width: 820px) { .fact-band { grid-template-columns: repeat(5, 1fr); padding: 2.6rem 2rem; }
+  .fact + .fact::before { content: ""; position: absolute; left: -.5rem; top: .3rem; bottom: .3rem; width: 1px; background: rgba(255,255,255,.13); } }
+.about-shot .media-placeholder { min-height: 300px; }
+.about-shot { transition: transform .4s var(--ease-out); }
+.about-shot:hover { transform: translateY(-4px); }
+/* lead paragraph on About reads like an article opener */
+.container.narrow p:first-child { font-size: clamp(1.15rem, 1.7vw, 1.35rem); line-height: 1.55; color: var(--navy); }
+
+/* ---------- Tables: sticky head, quieter chrome ---------- */
+.table-wrap { box-shadow: var(--e1); }
+.price-table thead th { position: sticky; top: 0; z-index: 1;
+  background: linear-gradient(180deg, #16294f, var(--navy)); }
+.price-table tbody tr { transition: background .18s var(--ease); }
+.price-table tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- Deal steps: a connected chain ---------- */
+.deal-steps { position: relative; }
+.deal-steps li { padding-left: 1.6rem; }
+.deal-steps li::before { content: ""; position: absolute; left: 0; top: 1.2rem; bottom: 1.2rem; width: 2px;
+  background: var(--gold); opacity: .35; border-radius: 2px; }
+.deal-steps li:hover { transform: translateX(4px); box-shadow: var(--e1); }
+.deal-steps li:hover::before { opacity: 1; }
+
+/* ---------- Buttons: a little more life ---------- */
+.btn { transition: background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease),
+  box-shadow .25s var(--ease), transform .18s var(--ease-out); }
+.btn-gold { box-shadow: 0 2px 14px rgba(201,168,76,.32); }
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,.42); }
+.btn-navy:hover, .btn-dark:hover { transform: translateY(-2px); box-shadow: var(--e2); }
+.btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 8px 26px rgba(37,211,102,.45); }
+.btn-outline:hover { transform: translateY(-1px); box-shadow: var(--e1); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 3px; }
+
+/* ---------- Navy CTA + footer: depth instead of a flat fill ---------- */
+.section-dark { position: relative; overflow: hidden;
+  background: linear-gradient(140deg, #0d1c3d 0%, var(--navy) 52%, #16294f 100%); }
+.section-dark::before { content: ""; position: absolute; inset: 0; background-image: var(--grain);
+  opacity: .08; mix-blend-mode: overlay; pointer-events: none; }
+.section-dark::after { content: ""; position: absolute; width: 620px; height: 620px; right: -180px; top: -240px;
+  background: radial-gradient(circle, rgba(201,168,76,.16), transparent 66%); pointer-events: none; }
+.book-inner { position: relative; z-index: 1; }
+.book-form { box-shadow: var(--e3); }
+.site-footer { background: linear-gradient(180deg, var(--footer-dark), #232c3c); }
+.wa-fab { animation: fabIn .5s var(--ease-out) .9s both; }
+@keyframes fabIn { from { opacity: 0; transform: scale(.6) translateY(10px); } }
+
+/* ---------- Breathing room where it matters ---------- */
+.book.section { padding: var(--section-y-lg) 0; }
+.section-alt { border-top-color: rgba(226,222,214,.8); border-bottom-color: rgba(226,222,214,.8); }
+
+/* ---------- Respect reduced motion: everything above goes still ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal.in { opacity: 1; transform: none; filter: none; transition: none; }
+  .anim, .stat-band li { opacity: 1; transform: none; animation: none; }
+  .wa-fab { animation: none; }
+  .trust-fact:hover, .service-card:hover, .size-card:hover, .info-card:hover,
+  .blog-card:hover, .about-shot:hover, .btn:hover, .lock-row:hover, .deal-steps li:hover { transform: none; }
+  .steps-rail i { transition: none; }
+}

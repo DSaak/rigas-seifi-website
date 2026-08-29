@@ -21,11 +21,52 @@ Body/nav/buttons: Inter. Buttons radius 4–6px, cards 8–12px.
 No red accents, no pure white, max 2 fonts, prices always open.
 All tokens are CSS variables at the top of `assets/styles.css`.
 
-**Vertical rhythm — keep it uniform.** Every section uses `--section-y`
-top *and* bottom, so the gap between any two sections is always the same
-(2 × 56px on desktop). Heading-to-content is always `--block-gap`. Do not
-give individual sections their own padding: uneven section spacing is the
-main thing that makes a site look machine-generated.
+**Vertical rhythm.** Every section uses `--section-y` top *and* bottom, so
+the gap between any two sections is the same. The hero and the booking CTA
+use `--section-y-lg` because they carry more weight. Heading-to-content is
+always `--block-gap`. Do not give other sections their own padding.
+
+## Modernisation layer (bottom of styles.css)
+Everything after the `MODERNISATION LAYER` banner is a later pass that keeps
+the palette, the copy and the section order but changes the craft. It is
+kept as one block at the end of the file so it can be read — or removed —
+on its own. What it does:
+
+- **Breaks the repeated grid.** Six sections used to be "centred heading over
+  a row of identical bordered boxes". "Why us" is now an editorial layout
+  (heading left, standfirst right, 3+3 / 2+2+2 / 3+3 cards, the first one a
+  navy feature card); services uses the same asymmetry; the About figures are
+  one navy band rather than five more boxes.
+- **Motion that responds to the reader.** Staggered scroll reveals (`--i` on
+  each item), a hero entrance sequence (`--d`), header condense-to-glass on
+  scroll, a reading-progress hairline, count-up figures, a gold rail that
+  fills down the How-it-works steps, hero parallax, and native
+  `::details-content` FAQ animation. **The partner logo row is deliberately
+  static** — no marquee, no auto-advance.
+- **Depth and texture.** Layered shadows (`--e1/2/3`), gradients plus a grain
+  overlay (`--grain`) on the navy blocks, gold hairline rules above headings,
+  and photo/video slots styled as designed navy panels instead of dashed
+  to-do boxes.
+- **All of it is opt-out.** The `prefers-reduced-motion` block at the very end
+  neutralises every animation, transform and transition; `app.js` checks the
+  same query and registers nothing.
+
+Counters preserve their rendered text exactly — years (`2017`) and composite
+values (`24/7`) are skipped on purpose, and the original string is restored
+on the final frame.
+
+## Header breakpoints
+The desktop nav switches on at **1120px**, not 900px: six Russian nav labels
+plus the phone, language switch and CTA do not fit below that and used to
+push a horizontal scrollbar onto every page (1024px overflowed by 52px,
+900px by 176px). 900–1119px keeps the hamburger — the language switch lives
+inside that panel, so it stays reachable. 1120–1299px runs a tightened
+header (smaller nav text, icon instead of the written phone number).
+
+## Asset cache-busting
+`build.py` appends `?v=<content-hash>` to `styles.css` and `app.js`. Without
+it browsers keep serving the previous stylesheet and script after a deploy,
+which is exactly what happened during the first redesign.
 
 ## Build
 ```
@@ -76,8 +117,16 @@ Structural consequences of that deck:
 ## Still TODO before launch
 - **Confirm the postcode** for Kaļķu iela 26 — `SITE["postcode"]` is set to
   LV-1050 (Vecrīga); it goes into the LocalBusiness schema.
-- Real photos (replace dashed placeholders: hero, How-it-works steps, and the
-  two About shots — first vault + new Kaļķu 26 premises; shot list in TZ §6.2).
+- **Real photos.** Seven slots are currently filled from `PHOTOS` in
+  content.py with **400px previews of the OLD premises**, pulled from the
+  archive shoot so the layout can be judged with pictures in it. They are not
+  production assets: the source only serves 400px without an interactive
+  download, so they are soft where the frame is larger (the hero renders a
+  400x267 original at 524x400). Replace with full-resolution shots of the
+  current vault. Deleting a slot from `PHOTOS` returns that panel to the
+  "photo goes here" state with no other edits.
+  **One caption does not match its photo:** the About page's second shot is
+  captioned "the new premises at Kaļķu iela 26" but shows the old vault.
 - Security video (placeholder with play button on home/security pages).
 - Wire the booking form to a real endpoint (email + Telegram/WhatsApp) and a
   `/thank-you` page for GA4 conversion tracking. Hook noted in app.js.
