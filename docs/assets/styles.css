@@ -19,6 +19,11 @@
   --radius: 10px;         /* cards 8–12px */
   --radius-btn: 5px;      /* buttons 4–6px */
   --container: 1140px;
+  /* ONE vertical rhythm for the whole site. Every section uses the same
+     top and bottom padding, so the gap between any two sections is always
+     2 × --section-y (96–112px) — no section is looser than its neighbour. */
+  --section-y: clamp(3rem, 5vw, 3.5rem);
+  --block-gap: 2.6rem;   /* heading (or heading + sub) → the content below it */
   --shadow: 0 8px 30px rgba(15, 32, 68, 0.08);
   --serif: "Playfair Display", "Palatino Linotype", Georgia, serif;
   --sans: "Inter", Arial, system-ui, sans-serif;
@@ -52,11 +57,15 @@ h3 { font-family: var(--sans); font-weight: 500; font-size: 1.35rem; line-height
 }
 
 .container { width: min(100% - 2.5rem, var(--container)); margin-inline: auto; }
-.section { padding: clamp(4.5rem, 9vw, 7.5rem) 0; } /* 80–120px vertical rhythm */
+.section { padding: var(--section-y) 0; }
 .section-alt { background: var(--off-white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .section-dark { background: var(--navy); }
 .section-dark h2 { color: #fff; }
-.section-sub { color: var(--silver); max-width: 56ch; margin-bottom: 2.4rem; }
+.section-sub { color: var(--silver); max-width: 56ch; margin-bottom: var(--block-gap); }
+/* heading → content is one distance everywhere; a sub-line sits tight under
+   the heading and takes over the gap to the content itself */
+h2.center { margin-bottom: var(--block-gap); }
+h2.center + .section-sub { margin-top: calc(var(--block-gap) * -0.6); }
 
 /* ---------- Buttons (≥48px tap targets, TZ §5.2) ---------- */
 .btn {
@@ -134,7 +143,7 @@ h3 { font-family: var(--sans); font-weight: 500; font-size: 1.35rem; line-height
 }
 
 /* ---------- Hero (light, with media slot on desktop) ---------- */
-.hero { padding: clamp(3.5rem, 8vw, 6.5rem) 0 clamp(3rem, 7vw, 5.5rem); }
+.hero { padding: var(--section-y) 0; }
 .hero-grid { display: grid; gap: 2.5rem; align-items: center; }
 .hero-inner { max-width: 640px; }
 .hero-eyebrow {
@@ -197,15 +206,6 @@ h3 { font-family: var(--sans); font-weight: 500; font-size: 1.35rem; line-height
   display: grid; place-items: center; color: var(--gold);
 }
 
-/* ---------- Advantages (photo cards, moodboard note 3) ---------- */
-.adv-grid { display: grid; gap: 1.4rem; }
-.adv { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
-.adv-photo { border-bottom: 1px solid var(--border); }
-.adv-photo .media-placeholder { border: 0; border-radius: 0; min-height: 190px; background: var(--warm-light); }
-.adv-body { padding: 1.6rem 1.8rem 1.8rem; }
-.adv h3 { margin-bottom: 0.45rem; }
-.adv p { color: var(--ink); font-size: 0.95rem; }
-@media (min-width: 760px) { .adv-grid { grid-template-columns: repeat(3, 1fr); } }
 
 /* ---------- Sizes ---------- */
 .size-grid { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
@@ -247,8 +247,14 @@ h3 { font-family: var(--sans); font-weight: 500; font-size: 1.35rem; line-height
 
 /* ---------- Security ---------- */
 .security-inner { display: grid; gap: 2.5rem; align-items: center; }
-.sec-list { list-style: none; display: grid; gap: 0.9rem; margin-top: 1.4rem; }
-.sec-list li { padding-left: 2rem; position: relative; color: var(--ink); }
+.sec-group + .sec-group { margin-top: 1.8rem; }
+.sec-group h3 { font-size: 1.12rem; font-weight: 600; }
+.sec-certs {
+  margin-top: 1.6rem; padding-top: 1.1rem; border-top: 1px solid var(--border);
+  color: var(--silver); font-size: 0.88rem;
+}
+.sec-list { list-style: none; display: grid; gap: 0.7rem; margin-top: 0.9rem; }
+.sec-list li { padding-left: 2rem; position: relative; color: var(--ink); font-size: 0.96rem; }
 .sec-list li::before {
   content: ""; position: absolute; left: 0; top: 0.32em; width: 18px; height: 18px;
   background: var(--gold); border-radius: 50%;
@@ -257,14 +263,35 @@ h3 { font-family: var(--sans); font-weight: 500; font-size: 1.35rem; line-height
 }
 @media (min-width: 860px) { .security-inner { grid-template-columns: 1.1fr 1fr; } }
 
-/* ---------- Trust (photo cards, no reviews — moodboard notes 6) ---------- */
-.trust-grid { display: grid; gap: 1.2rem; }
-.trust-fact { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-.trust-photo .media-placeholder { border: 0; border-radius: 0; min-height: 160px; background: var(--warm-light); }
-.trust-body { padding: 1.4rem 1.5rem 1.6rem; }
+/* ---------- Why clients choose us (icon cards, no reviews — moodboard note 6) ----------
+   flex rather than grid: with five cards the last row centres itself
+   instead of leaving a hole on the right. */
+.trust-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2rem; }
+.trust-fact {
+  /* 300px basis = three per row at container width, never four */
+  flex: 1 1 300px; background: var(--off-white); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.6rem 1.6rem 1.8rem;
+}
+.trust .section-sub { color: var(--ink); max-width: 74ch; }
 .trust-fact strong { font: 500 1.3rem var(--serif); color: var(--navy); display: block; margin-bottom: 0.3rem; }
 .trust-fact p { color: var(--ink); font-size: 0.94rem; }
-@media (min-width: 760px) { .trust-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 760px) { .trust-fact { max-width: calc((var(--container) - 2.4rem) / 3); } }
+/* the About page reuses .trust-fact for plain number facts (no icon) */
+.trust-fact:not(:has(.adv-icon)) { text-align: center; }
+
+/* ---------- Partners ---------- */
+.partner-row {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 1.2rem;
+}
+.partner {
+  flex: 0 1 260px; min-height: 110px; display: grid; place-items: center;
+  background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.4rem 1.8rem; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.partner:hover { border-color: var(--gold); box-shadow: var(--shadow); }
+.partner img { max-height: 66px; width: auto; object-fit: contain; }
+.partner-name { font: 500 1.05rem var(--serif); color: var(--navy); text-align: center; }
 
 /* ---------- Location ---------- */
 .location-inner { display: grid; gap: 2rem; }
@@ -429,7 +456,7 @@ body.nav-locked { overflow: hidden; }
 @media (max-width: 899px) { .header-actions > .btn { display: none; } } /* book lives in mobile nav */
 
 /* ---------- Page hero (inner pages) ---------- */
-.page-hero { padding: clamp(2.6rem, 6vw, 4.2rem) 0 clamp(1.6rem, 3vw, 2.4rem); }
+.page-hero { padding: var(--section-y) 0; }
 .page-hero h1 { font-size: clamp(2rem, 4vw, 3rem); max-width: 20ch; }
 .page-hero-sub { color: var(--ink); font-size: 1.08rem; margin-top: 0.9rem; max-width: 56ch; }
 
@@ -483,6 +510,57 @@ h2.center, .section-sub.center { margin-left: auto; margin-right: auto; }
 .blog-card h3 { font-size: 1.1rem; }
 @media (min-width: 640px) { .blog-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 980px) { .blog-grid { grid-template-columns: repeat(3, 1fr); } }
+
+/* ---------- Security page: the triple lock, row by row ---------- */
+.lock-rows { display: grid; gap: 0.9rem; margin-top: 0.9rem; }
+.lock-row {
+  background: var(--off-white); border: 1px solid var(--border);
+  border-left: 3px solid var(--gold); border-radius: var(--radius-btn);
+  padding: 1rem 1.2rem;
+}
+.lock-row strong { display: block; color: var(--navy); font-weight: 600; margin-bottom: 0.25rem; }
+.lock-row p { color: var(--ink); font-size: 0.94rem; }
+
+/* ---------- Confidentiality block ---------- */
+.privacy .container.narrow { text-align: center; }
+.privacy-body { color: var(--ink); font-size: 1.08rem; line-height: 1.65; }
+.privacy-note {
+  margin-top: 1.4rem; padding-top: 1.2rem; border-top: 1px solid var(--border);
+  color: var(--silver); font-size: 0.9rem;
+}
+
+/* ---------- Additional-services table (2 columns) ---------- */
+.extras-table { min-width: 420px; }
+.extras-table .num { text-align: right; white-space: nowrap; }
+.extras-table td.num strong { color: var(--navy); }
+
+/* ---------- The Deal Box, step by step ---------- */
+.deal-steps { list-style: none; display: grid; gap: 0.9rem; counter-reset: deal; }
+.deal-steps li {
+  background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.2rem 1.4rem; display: grid; gap: 0.35rem;
+}
+.deal-num {
+  font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--gold-dark); font-weight: 600;
+}
+.deal-steps p { color: var(--ink); font-size: 0.97rem; }
+.deal-note {
+  margin-top: 1.6rem; padding: 1.1rem 1.3rem; border-left: 3px solid var(--gold);
+  background: var(--gold-light); border-radius: var(--radius-btn);
+  color: var(--ink); font-size: 0.95rem;
+}
+
+/* ---------- About: vault photos ---------- */
+.about-shots { display: grid; gap: 1.4rem; }
+.about-shot .media-placeholder { min-height: 240px; }
+.about-shot figcaption { margin-top: 0.7rem; color: var(--silver); font-size: 0.88rem; text-align: center; }
+@media (min-width: 760px) { .about-shots { grid-template-columns: repeat(2, 1fr); } }
+
+/* service cards: each ends with its own "learn more" button */
+.service-card { display: flex; flex-direction: column; }
+.service-more { align-self: flex-start; margin-top: auto; padding-top: 0.55rem; }
+.service-card p { margin-bottom: 1.1rem; }
 
 /* ---------- Reveal animation ---------- */
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.55s ease, transform 0.55s ease; }

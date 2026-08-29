@@ -9,3 +9,6 @@ __pycache__/
 
 # local file-based snapshots (own history; not tracked in git)
 versions/
+
+# Claude Code local dev config (machine-specific absolute paths)
+.claude/

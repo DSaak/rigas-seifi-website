@@ -10,7 +10,8 @@ mkdir -p "$VROOT"
 
 # next version number (highest existing vNN + 1)
 LAST=$(ls -1 "$VROOT" 2>/dev/null | sed -n 's/^v\([0-9]\{1,\}\).*/\1/p' | sort -n | tail -1)
-NEXT=$(printf "%02d" $(( ${LAST:-0} + 1 )))
+# 10# forces base 10: without it the shell reads "08"/"09" as octal and errors
+NEXT=$(printf "%02d" $(( 10#${LAST:-0} + 1 )))
 STAMP=$(date +%Y%m%d-%H%M)
 DEST="$VROOT/v${NEXT}_${LABEL}_${STAMP}"
 
