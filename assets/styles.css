@@ -104,7 +104,7 @@ h2.center + .section-sub { margin-top: calc(var(--block-gap) * -0.6); }
 .header-inner { display: flex; align-items: center; gap: 1.2rem; min-height: 72px; }
 .logo { display: flex; align-items: center; gap: 0.6rem; color: var(--gold); }
 .logo:hover { color: var(--gold); }
-.logo-mark { width: 32px; height: 32px; }
+.logo-mark { width: 35px; height: 32px; }   /* the crossed-keys mark is wider than tall */
 .logo-text { font: 500 1.02rem var(--serif); letter-spacing: 0.14em; color: #fff; }
 /* Nav is anchored left (after the logo), not centered, so its position
    never depends on how wide the CTA renders in the active language */
@@ -201,10 +201,6 @@ h2.center + .section-sub { margin-top: calc(var(--block-gap) * -0.6); }
 }
 .media-placeholder svg { color: var(--gold); }
 .media-placeholder.tall { min-height: 320px; }
-.play-badge {
-  width: 64px; height: 64px; border-radius: 50%; background: var(--navy);
-  display: grid; place-items: center; color: var(--gold);
-}
 
 
 /* ---------- Sizes ---------- */
@@ -261,6 +257,21 @@ h2.center + .section-sub { margin-top: calc(var(--block-gap) * -0.6); }
   -webkit-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M9.5 16.2 5.8 12.5l-1.3 1.3 5 5 10-10-1.3-1.3z"/></svg>') center/contain no-repeat;
           mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M9.5 16.2 5.8 12.5l-1.3 1.3 5 5 10-10-1.3-1.3z"/></svg>') center/contain no-repeat;
 }
+/* Four photos beside the copy, filling the column the old single video
+   panel left half empty. Square tiles crop the mixed portrait/landscape
+   originals predictably; .media-shot's own fixed height is overridden so
+   each tile follows the grid cell instead. */
+/* Wayfinding strip on the contacts page: four landscape shots across the
+   container, two-up on narrow screens. Shares .media-shot, so the navy
+   overlay and the hover scale come along with it. */
+.photo-strip { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.6rem; }
+.photo-strip .media-shot { height: auto; aspect-ratio: 3 / 2; }  /* the source aspect, so the signs are never cropped */
+@media (min-width: 760px) { .photo-strip { grid-template-columns: repeat(4, 1fr); } }
+
+.security-shots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+.security-shots .media-shot { height: auto; aspect-ratio: 4 / 5; }
+@media (max-width: 479px) { .security-shots { gap: 0.6rem; } }
+
 @media (min-width: 860px) { .security-inner { grid-template-columns: 1.1fr 1fr; } }
 
 /* ---------- Why clients choose us (icon cards, no reviews — moodboard note 6) ----------
@@ -681,9 +692,6 @@ strong, b { font-variant-numeric: tabular-nums; }
 .media-placeholder svg { color: var(--gold); opacity: .85; }
 .media-placeholder.tall { min-height: 400px; }
 .step-media .media-placeholder { min-height: 230px; }
-.play-badge { background: rgba(255,255,255,.1); backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,.22); transition: transform .3s var(--ease-out); }
-.security-video:hover .play-badge { transform: scale(1.08); }
 
 /* ---------- Real photos (.media-shot) ----------
    Same box as the placeholder panel it replaces, so nothing reflows when a
@@ -708,17 +716,11 @@ strong, b { font-variant-numeric: tabular-nums; }
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(180deg, rgba(15,32,68,.10), rgba(15,32,68,.28));
 }
-.media-shot .play-badge {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  z-index: 1; background: rgba(15,32,68,.55); backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,.3); color: #fff;
-}
-.security-video:hover .media-shot .play-badge { transform: translate(-50%, -50%) scale(1.08); }
 .media-shot img { transition: transform .6s var(--ease-out); }
-.about-shot:hover .media-shot img, .step-media:hover .media-shot img { transform: scale(1.03); }
+.about-shot:hover .media-shot img, .step-media:hover .media-shot img,
+.security-shots .media-shot:hover img, .photo-strip .media-shot:hover img { transform: scale(1.03); }
 @media (prefers-reduced-motion: reduce) {
-  .media-shot img, .security-video:hover .media-shot .play-badge { transition: none; transform: none; }
-  .media-shot .play-badge { transform: translate(-50%, -50%); }
+  .media-shot img { transition: none; transform: none; }
 }
 
 /* ---------- Stat band: gradient, grain, counting numerals ---------- */
@@ -823,7 +825,7 @@ strong, b { font-variant-numeric: tabular-nums; }
 /* ---------- Security: the intro sticks while the specs scroll past ---------- */
 @media (min-width: 960px) {
   .security-inner { align-items: start; }
-  .security .security-video { position: sticky; top: 104px; }
+  .security .security-shots { position: sticky; top: 104px; }
 }
 .sec-list li { transition: transform .3s var(--ease-out); }
 .sec-list li:hover { transform: translateX(3px); }

@@ -80,15 +80,11 @@ def icon(name):
 
 # ---------- media placeholders (real photos / video pending) ----------
 CAMERA_SVG = '<svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m3 17 5-5 4 4 3-3 6 6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>'
-PLAY_SVG = '<span class="play-badge"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>'
 
 MEDIA_TXT = {
     "photo": {"lv": "Šeit būs reāls foto no glabātavas",
               "ru": "Здесь будет реальное фото хранилища",
               "en": "A real vault photo goes here"},
-    "video": {"lv": "Šeit būs video par drošību",
-              "ru": "Здесь будет видео о безопасности",
-              "en": "A security video goes here"},
     "hero":  {"lv": "Foto vai video no glabātavas",
               "ru": "Фото или видео хранилища",
               "en": "Photo or video of the vault"},
@@ -98,16 +94,46 @@ def media_placeholder(lang, kind="photo", extra="", slot=None):
     """A real photo when PHOTOS has one for this slot, otherwise the styled
     'photo goes here' panel. Drop a slot from PHOTOS and the panel comes
     back with no other edits."""
-    cls = " tall" if kind in ("video", "hero") else ""
+    cls = " tall" if kind == "hero" else ""
     photo = C.PHOTOS.get(slot) if slot else None
     if photo:
-        play = PLAY_SVG if kind == "video" else ""
         return (f'<div class="media-shot{cls}{extra}">'
                 f'<img src="{ASSET}/img/photos/{photo["file"]}" alt="{esc(photo[lang])}"'
-                f' loading="lazy" decoding="async">{play}</div>')
-    ic = PLAY_SVG if kind == "video" else CAMERA_SVG
+                f' loading="lazy" decoding="async"></div>')
     txt = MEDIA_TXT[kind][lang]
-    return f'<div class="media-placeholder{cls}{extra}">{ic}<p>{esc(txt)}</p></div>'
+    return f'<div class="media-placeholder{cls}{extra}">{CAMERA_SVG}<p>{esc(txt)}</p></div>'
+
+
+def security_shots(lang):
+    """The four-up photo block beside the security copy. It fills the column
+    the old single video panel left half empty. An empty SECURITY_SHOTS
+    falls back to the 'photo goes here' panel."""
+    shots = getattr(C, "SECURITY_SHOTS", [])
+    if not shots:
+        return media_placeholder(lang, "photo")
+    tiles = "".join(
+        f'<div class="media-shot" style="--i:{i}">'
+        f'<img src="{ASSET}/img/photos/{s["file"]}" alt="{esc(s[lang])}"'
+        f' loading="lazy" decoding="async"></div>'
+        for i, s in enumerate(shots))
+    return f'<div class="security-shots reveal">{tiles}</div>'
+
+
+def arrival_strip(lang):
+    """Four wayfinding photos at the foot of the contacts page. An empty
+    ARRIVAL["shots"] removes the whole section."""
+    a = getattr(C, "ARRIVAL", None)
+    if not a or not a["shots"]:
+        return ""
+    tiles = "".join(
+        f'<div class="media-shot reveal" style="--i:{i}">'
+        f'<img src="{ASSET}/img/photos/{sh["file"]}" alt="{esc(sh[lang])}"'
+        f' loading="lazy" decoding="async"></div>'
+        for i, sh in enumerate(a["shots"]))
+    return (f'<section class="section"><div class="container">'
+            f'<h2 class="center">{esc(a["heading"][lang])}</h2>'
+            f'<p class="section-sub center">{esc(a["sub"][lang])}</p>'
+            f'<div class="photo-strip">{tiles}</div></div></section>')
 
 
 # ---------- isometric safe illustration (per box size) ----------
@@ -135,7 +161,11 @@ def safe_svg(h):
 </svg>'''
 
 WA_SVG = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .2-3.2-.7-2.7-1.1-4.4-3.8-4.6-4-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9.9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.4l.9 2.1c.1.2.1.4 0 .6l-.4.6-.5.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.2 1.4 2.5 1.5.3.1.5.1.7-.1l1-1.2c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.4.1 0 .1.6-.1 1.3Z"/></svg>'
-LOGO_SVG = '<svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="20" cy="20" r="9" fill="none" stroke="currentColor" stroke-width="2"/><line x1="20" y1="3" x2="20" y2="11" stroke="currentColor" stroke-width="2.5"/><line x1="20" y1="29" x2="20" y2="37" stroke="currentColor" stroke-width="2.5"/><line x1="3" y1="20" x2="11" y2="20" stroke="currentColor" stroke-width="2.5"/><line x1="29" y1="20" x2="37" y2="20" stroke="currentColor" stroke-width="2.5"/></svg>'
+# The house mark: two crossed keys, redrawn as vector from the brass plaque
+# in the 28 August 2026 shoot (frame 42). Two sibling paths on purpose — the
+# bows carry counter-wound subpaths to punch the ring holes, and keeping the
+# shafts in their own path stops that winding from cancelling where they meet.
+LOGO_SVG = '<svg class="logo-mark" viewBox="0 0 88.4 80.4" aria-hidden="true" fill="currentColor"><path d="M25.04 60.58L77.57 4.42L72.83 -0.02L20.29 56.14ZM80.70 6.00L87.90 13.20L80.70 20.40L73.50 13.20ZM68.11 56.14L15.57 -0.02L10.83 4.42L63.36 60.58ZM7.70 6.00L14.90 13.20L7.70 20.40L0.50 13.20Z"/><path d="M16.57 66.22a9.40 9.40 0 1 1 18.80 0a9.40 9.40 0 1 1 -18.80 0M1.66 70.78a9.40 9.40 0 1 1 18.80 0a9.40 9.40 0 1 1 -18.80 0M5.17 55.59a9.40 9.40 0 1 1 18.80 0a9.40 9.40 0 1 1 -18.80 0M21.37 66.22a4.60 4.60 0 1 0 9.20 0a4.60 4.60 0 1 0 -9.20 0M6.46 70.78a4.60 4.60 0 1 0 9.20 0a4.60 4.60 0 1 0 -9.20 0M9.97 55.59a4.60 4.60 0 1 0 9.20 0a4.60 4.60 0 1 0 -9.20 0M53.03 66.22a9.40 9.40 0 1 1 18.80 0a9.40 9.40 0 1 1 -18.80 0M64.43 55.59a9.40 9.40 0 1 1 18.80 0a9.40 9.40 0 1 1 -18.80 0M67.94 70.78a9.40 9.40 0 1 1 18.80 0a9.40 9.40 0 1 1 -18.80 0M57.83 66.22a4.60 4.60 0 1 0 9.20 0a4.60 4.60 0 1 0 -9.20 0M69.23 55.59a4.60 4.60 0 1 0 9.20 0a4.60 4.60 0 1 0 -9.20 0M72.74 70.78a4.60 4.60 0 1 0 9.20 0a4.60 4.60 0 1 0 -9.20 0"/></svg>'
 WA_HREF = lambda lang: f"https://wa.me/{S['wa_number']}?text={html.escape(__import__('urllib.parse', fromlist=['quote']).quote(C.UI[lang]['wa_msg']), quote=True)}"
 
 
@@ -164,6 +194,9 @@ def head(lang, page):
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="{ASSET}/img/favicon.ico" sizes="32x32">
+<link rel="icon" href="{ASSET}/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{ASSET}/img/apple-touch-icon.png">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
 <meta name="keywords" content="{esc(kw)}">
@@ -405,12 +438,13 @@ def security_block(lang, full=False, alt=False):
             lis = "".join('<li style="--i:%d">%s</li>' % (i, mb(p)) for i, p in enumerate(points))
             groups += (f'<div class="sec-group reveal"><h3>{esc(title)}</h3>'
                        f'<ul class="sec-list">{lis}</ul></div>')
-    # a video will live here (moodboard note 5)
-    video = f'<div class="security-video reveal">{media_placeholder(lang, "video", slot="security_video")}</div>'
+    # four photos of the vault, the locks and the boxes (moodboard note 5,
+    # which reserved this column for a video that was never filmed)
+    shots = security_shots(lang)
     return f"""<section class="security section{' section-alt' if alt else ''}"><div class="container security-inner">
   <div class="security-text">{'' if full else f"<h2>{esc(C.H[lang]['security'])}</h2>"}{groups}
     <p class="sec-certs">{esc(C.CERTS[lang])}</p></div>
-  {video}</div></section>"""
+  {shots}</div></section>"""
 
 def trust_block(lang, alt=False):
     # "why clients choose us": intro + icon cards (no reviews — there are none)
@@ -619,7 +653,8 @@ def body_faq(lang):
 
 def body_contacts(lang):
     sub = {'lv':'Sazinieties ar mums vai rezervējiet seifu tiešsaistē.','ru':'Свяжитесь с нами или забронируйте сейф онлайн.','en':'Get in touch or book your box online.'}[lang]
-    return breadcrumb(lang, "contacts") + page_hero(lang, C.UI[lang]["nav"]["contacts"], sub) + book_section(lang) + location_block(lang, heading=True)
+    return (breadcrumb(lang, "contacts") + page_hero(lang, C.UI[lang]["nav"]["contacts"], sub)
+            + book_section(lang) + location_block(lang, heading=True) + arrival_strip(lang))
 
 def body_blog(lang):
     bl = C.BLOG[lang]
@@ -643,6 +678,9 @@ def build():
     os.makedirs(DIST)
     # assets
     shutil.copytree(ASSETS_SRC, os.path.join(DIST, "assets"))
+    # browsers ask for /favicon.ico whether or not a <link> says so
+    shutil.copy2(os.path.join(ASSETS_SRC, "img", "favicon.ico"),
+                 os.path.join(DIST, "favicon.ico"))
 
     for lang in C.LANGS:
         d = os.path.join(DIST, lang)
@@ -656,6 +694,7 @@ def build():
     # root language redirect (x-default)
     root = f"""<!DOCTYPE html><html lang="{C.DEFAULT_LANG}"><head><meta charset="UTF-8">
 <title>{esc(S['brand'])}</title>
+<link rel="icon" href="assets/img/favicon.ico" sizes="32x32">
 <link rel="canonical" href="{S['domain']}/{C.DEFAULT_LANG}/">
 {''.join(f'<link rel="alternate" hreflang="{l}" href="{S["domain"]}/{l}/">' for l in C.LANGS)}
 <link rel="alternate" hreflang="x-default" href="{S['domain']}/{C.DEFAULT_LANG}/">

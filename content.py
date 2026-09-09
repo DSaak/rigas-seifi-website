@@ -379,46 +379,102 @@ TRUST = {
 
 # =====================================================================
 #  PHOTOS  —  slot -> file in assets/img/photos/ + alt text per language.
-#  PLACEHOLDERS: these are 400px previews of the OLD premises (the ones
-#  used before the 2026 move to Kaļķu iela 26),
-#  pulled from the archive shoot. They stand in so the layout can be judged
-#  with real pictures in it. Replace with full-resolution shots of the
-#  current vault before launch; drop a slot from this dict and that panel
-#  falls back to the "photo goes here" panel automatically.
+#  Source: the 28 August 2026 shoot of the Kaļķu iela 26 premises
+#  (127 frames). Everything here is a full-resolution frame from that
+#  shoot, resized for the web, except "about1", which is captioned
+#  "the first vault" and therefore still uses the 400px archive preview
+#  of the old premises — the 2026 shoot covers the new vault only.
+#  Drop a slot from this dict and that panel falls back to the
+#  "photo goes here" panel automatically.
 # =====================================================================
 PHOTOS = {
-    "hero": {"file": "vault-corridor.jpg",
-             "lv": "Seifu glabātavas eja ar seifu rindām",
-             "ru": "Проход в хранилище с рядами сейфовых ячеек",
-             "en": "Vault aisle lined with safe deposit boxes"},
-    "security_video": {"file": "vault-door.jpg",
-             "lv": "Rosengrens bruņotās glabātavas durvis",
-             "ru": "Бронированная дверь хранилища Rosengrens",
-             "en": "Rosengrens armoured vault door"},
-    "step1": {"file": "box-sizes.jpg",
-             "lv": "Pieci seifu izmēri blakus salīdzinājumam",
-             "ru": "Пять размеров сейфовых ячеек рядом для сравнения",
-             "en": "Five box sizes side by side for comparison"},
-    "step2": {"file": "meeting-room.jpg",
-             "lv": "Privāta kabīne dokumentu kārtošanai",
-             "ru": "Отдельная кабина для оформления документов",
-             "en": "A private booth for handling paperwork"},
-    "step3": {"file": "box-retrieval.jpg",
-             "lv": "Klients atslēdz savu seifu",
-             "ru": "Клиент открывает свою ячейку",
-             "en": "A client unlocking their own box"},
+    "hero": {"file": "vault-aisle.jpg",  # frame 116,
+             "lv": "Glabātavas eja ar seifiem abās pusēs",
+             "ru": "Проход в хранилище с ячейками по обеим сторонам",
+             "en": "The vault aisle, lined with safe deposit boxes on both sides"},
+    "step1": {"file": "box-sizes.jpg",  # frame 126,
+             "lv": "Pieci seifu izmēri blakus — no mazākā līdz lielākajam",
+             "ru": "Пять размеров ячеек рядом — от меньшего к большему",
+             "en": "The five box sizes side by side, smallest to largest"},
+    "step2": {"file": "signing-office.jpg",  # frame 76,
+             "lv": "Birojs, kurā tiek parakstīts līgums",
+             "ru": "Кабинет, где подписывается договор",
+             "en": "The office where the agreement is signed"},
+    "step3": {"file": "box-open.jpg",  # frame 122,
+             "lv": "Atvērts seifs ar izvilktu kasti",
+             "ru": "Открытая ячейка с выдвинутым лотком",
+             "en": "An open safe deposit box with its tray drawn out"},
+    # Archive frame of the OLD premises, and the caption ("the first vault")
+    # calls for exactly that. Replace only if a better shot of the 2017
+    # vault turns up.
     "about1": {"file": "vault-first.jpg",
-             "lv": "Glabātavas telpa ar seifu rindām",
-             "ru": "Помещение хранилища с рядами ячеек",
-             "en": "The vault room with its rows of boxes"},
-    # !! MISMATCH TO FIX: the caption for this slot says "the new premises at
-    # Kaļķu iela 26", but every photo available is of the OLD place. Swap in a
-    # real Kaļķu-26 shot, or delete this entry so the panel goes back to
-    # "photo goes here", before this ever goes live.
-    "about2": {"file": "vault-aisle.jpg",
-             "lv": "Seifu rindas glabātavā",
-             "ru": "Ряды ячеек в хранилище",
-             "en": "Rows of boxes inside the vault"},
+             "lv": "Pirmā glabātava — telpa ar seifu rindām",
+             "ru": "Первое хранилище — помещение с рядами ячеек",
+             "en": "The first vault, with its rows of boxes"},
+    "about2": {"file": "vault-rows.jpg",  # frame 113,
+             "lv": "Seifu rindas jaunajā glabātavā Kaļķu ielā 26",
+             "ru": "Ряды ячеек в новом хранилище на Kaļķu iela 26",
+             "en": "Rows of boxes in the new vault at Kaļķu iela 26"},
+}
+
+# =====================================================================
+#  SECURITY_SHOTS  —  the four-up photo block beside the security copy on
+#  the home and security pages. It used to be a single panel with a play
+#  button over it, reserved for a security video that was never filmed.
+#  The four shots follow the copy beside them: the vault, the mechanical
+#  key, the electronic PIN, and the boxes. Empty this list and the block
+#  falls back to the "photo goes here" panel.
+# =====================================================================
+SECURITY_SHOTS = [
+    {"file": "vault-door.jpg",  # frame 89
+     "lv": "Atvērtas bruņotās glabātavas durvis, aiz tām seifi",
+     "ru": "Открытая бронированная дверь хранилища, за ней ячейки",
+     "en": "The armoured vault door standing open, with the boxes behind it"},
+    {"file": "certificate-and-keys.jpg",  # frame 66, pre-cropped to 4:5 so both keys stay in frame
+     "lv": "Klienta apliecība ar seifa slēdzenes cilindru un abām atslēgām",
+     "ru": "Клиентское свидетельство с цилиндром замка ячейки и двумя ключами",
+     "en": "A client certificate with a box lock cylinder and its two keys"},
+    {"file": "pin-terminal.jpg",  # frame 65
+     "lv": "PIN ievades terminālis piekļuvei seifam",
+     "ru": "Терминал ввода PIN для доступа к ячейке",
+     "en": "The PIN terminal used to reach a box"},
+    {"file": "box-locks.jpg",  # frame 112
+     "lv": "Seifu rindas ar misiņa slēdzenēm",
+     "ru": "Ряды ячеек с латунными замками",
+     "en": "Rows of boxes with their brass locks"},
+]
+
+# =====================================================================
+#  ARRIVAL  —  the photo strip at the foot of the contacts page. Four
+#  shots in the order a visitor meets them, being the neighbourhood, the
+#  street, the door plate with the intercom, and the sign with the
+#  opening hours. Empty "shots" and the whole block disappears.
+# =====================================================================
+ARRIVAL = {
+    "heading": {"lv": "Kā mūs atrast",
+                "ru": "Как нас найти",
+                "en": "Finding us"},
+    "sub": {"lv": "Ko meklēt, kad esat klāt.",
+            "ru": "На что обратить внимание по прибытии.",
+            "en": "What to look for when you arrive."},
+    "shots": [
+        {"file": "riga-centre.jpg",  # frame 13
+         "lv": "Apkaime Rīgas centrā",
+         "ru": "Район в центре Риги",
+         "en": "The neighbourhood in central Riga"},
+        {"file": "street-kalku.jpg",  # frame 16
+         "lv": "Kaļķu iela, kur atrodas ieeja",
+         "ru": "Улица Kaļķu iela, где находится вход",
+         "en": "Kaļķu iela, the street the entrance is on"},
+        {"file": "door-plate.jpg",  # frame 29
+         "lv": "Ieejas domofons un Rīgas Seifi durvju plāksne",
+         "ru": "Домофон у входа и табличка Rīgas Seifi",
+         "en": "The entry intercom and the Rīgas Seifi door plate"},
+        {"file": "opening-hours.jpg",  # frame 50
+         "lv": "Rīgas Seifi izkārtne ar darba laiku",
+         "ru": "Вывеска Rīgas Seifi с часами работы",
+         "en": "The Rīgas Seifi sign with the opening hours"},
+    ],
 }
 
 # Partners (logo file in assets/img/, or None until the logo is supplied)

@@ -45,7 +45,7 @@ on its own. What it does:
   static** — no marquee, no auto-advance.
 - **Depth and texture.** Layered shadows (`--e1/2/3`), gradients plus a grain
   overlay (`--grain`) on the navy blocks, gold hairline rules above headings,
-  and photo/video slots styled as designed navy panels instead of dashed
+  and photo slots styled as designed navy panels instead of dashed
   to-do boxes.
 - **All of it is opt-out.** The `prefers-reduced-motion` block at the very end
   neutralises every animation, transform and transition; `app.js` checks the
@@ -54,6 +54,47 @@ on its own. What it does:
 Counters preserve their rendered text exactly — years (`2017`) and composite
 values (`24/7`) are skipped on purpose, and the original string is restored
 on the final frame.
+
+## Security section: four photos, no video
+The column beside the security copy held a single panel with a play button,
+reserved for a security video. No video was ever filmed, so the play button
+promised something that did not exist and the panel left the column half
+empty. It now carries `SECURITY_SHOTS` from content.py — four 4:5 tiles in a
+2x2 grid that follow the copy beside them, being the vault, the mechanical
+key, the electronic PIN, and the boxes. Empty that list and the block falls
+back to the "photo goes here" panel. `PLAY_SVG`, the `video` media kind and
+the `.play-badge` rules were removed with it.
+
+## Contacts page: the arrival strip
+The contacts page carried no photographs, so `ARRIVAL` in content.py adds a
+four-across strip under the map, running in the order a visitor meets them —
+the neighbourhood, Kaļķu iela, the door plate with the intercom, and the sign
+with the opening hours. The tiles are 3:2, matching the source frames, so the
+lettering on the two signs is never cropped. Empty `ARRIVAL["shots"]` and the
+whole section disappears.
+
+## Logo and favicon
+The house mark is the two crossed keys, redrawn as vector from the brass
+plaque in the 2026 shoot (frame 42) and inlined as `LOGO_SVG` in build.py. It
+is two sibling paths on purpose. The bows carry counter-wound subpaths to
+punch the three ring holes, and keeping the shafts in a path of their own
+stops that winding from cancelling against them, which otherwise leaves a
+white notch where a shaft meets a bow. The shafts also stop short of each bow
+centre so they never cross a ring hole. Colour comes from `currentColor`, so
+the mark is gold in the header and takes the surrounding tone elsewhere.
+
+The icons live in `assets/img/` and are linked from every page head:
+- `favicon.svg` — the detailed mark on a navy tile.
+- `favicon.ico` — three frames, and **the 16px frame is different artwork**.
+  At that size the ring holes close up and the mark turns to mush, so 16px
+  uses a simplified drawing with solid bows and heavier shafts, while 32 and
+  48 use the detailed one. Regenerating the .ico by resampling a single image
+  loses this.
+- `apple-touch-icon.png` — 180px, opaque, with wider padding because iOS
+  masks the corners itself.
+
+`build.py` also copies `favicon.ico` to the site root, because browsers ask
+for `/favicon.ico` whether or not a `<link>` points at it.
 
 ## Header breakpoints
 The desktop nav switches on at **1120px**, not 900px: six Russian nav labels
@@ -117,17 +158,17 @@ Structural consequences of that deck:
 ## Still TODO before launch
 - **Confirm the postcode** for Kaļķu iela 26 — `SITE["postcode"]` is set to
   LV-1050 (Vecrīga); it goes into the LocalBusiness schema.
-- **Real photos.** Seven slots are currently filled from `PHOTOS` in
-  content.py with **400px previews of the OLD premises**, pulled from the
-  archive shoot so the layout can be judged with pictures in it. They are not
-  production assets: the source only serves 400px without an interactive
-  download, so they are soft where the frame is larger (the hero renders a
-  400x267 original at 524x400). Replace with full-resolution shots of the
-  current vault. Deleting a slot from `PHOTOS` returns that panel to the
-  "photo goes here" state with no other edits.
-  **One caption does not match its photo:** the About page's second shot is
-  captioned "the new premises at Kaļķu iela 26" but shows the old vault.
-- Security video (placeholder with play button on home/security pages).
+- **Real photos.** Thirteen frames from the 28 August 2026 shoot of Kaļķu
+  iela 26 (127 frames in all) now carry the site — the hero, the three
+  how-it-works steps and the About page's second shot in `PHOTOS`, the four
+  security tiles in `SECURITY_SHOTS`, and the four wayfinding shots in
+  `ARRIVAL`. Every entry records the frame it came from.
+  The About page's **first** slot still uses the 400px archive preview,
+  because its caption reads "the first vault" and the 2026 shoot covers the
+  new premises only. Finish it by supplying a shot of the 2017 vault, or by
+  rewording the caption to something the new shoot can illustrate.
+  Deleting a slot from `PHOTOS` returns that panel to the "photo goes here"
+  state with no other edits.
 - Wire the booking form to a real endpoint (email + Telegram/WhatsApp) and a
   `/thank-you` page for GA4 conversion tracking. Hook noted in app.js.
 - Privacy & cookie policy page content; connect GA4/GTM + Meta Pixel after consent.
