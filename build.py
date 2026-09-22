@@ -73,6 +73,10 @@ ICONS = {
     "truck": '<rect x="2" y="7" width="11" height="9" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M13 10h4l4 4v2h-8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="7" cy="18" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="17" cy="18" r="1.8" fill="none" stroke="currentColor" stroke-width="1.5"/>',
     "users": '<circle cx="9" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M16.2 6.2a3 3 0 0 1 0 5.6M17.5 14.8c2.1.7 3.5 2.5 3.5 5.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
     "room": '<rect x="3" y="4" width="18" height="14" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h18M8 18v2M16 18v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+    "pin": '<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>',
+    "phone": '<path d="M5 4h3.5l1.5 4-2 1.5a12 12 0 0 0 6.5 6.5L16 14l4 1.5V19a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+    "mail": '<rect x="3" y="5" width="18" height="14" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m3.5 6 8.5 7 8.5-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+    "play": '<path d="M9 6.5v11l9-5.5z" fill="currentColor"/>',
 }
 def icon(name):
     return f'<svg viewBox="0 0 24 24" aria-hidden="true">{ICONS.get(name, ICONS["box"])}</svg>'
@@ -97,8 +101,10 @@ def media_placeholder(lang, kind="photo", extra="", slot=None):
     cls = " tall" if kind == "hero" else ""
     photo = C.PHOTOS.get(slot) if slot else None
     if photo:
+        # optional "pos" = CSS object-position, to keep the subject in a cropped frame
+        pos = f' style="object-position:{photo["pos"]}"' if photo.get("pos") else ""
         return (f'<div class="media-shot{cls}{extra}">'
-                f'<img src="{ASSET}/img/photos/{photo["file"]}" alt="{esc(photo[lang])}"'
+                f'<img src="{ASSET}/img/photos/{photo["file"]}" alt="{esc(photo[lang])}"{pos}'
                 f' loading="lazy" decoding="async"></div>')
     txt = MEDIA_TXT[kind][lang]
     return f'<div class="media-placeholder{cls}{extra}">{CAMERA_SVG}<p>{esc(txt)}</p></div>'
@@ -119,18 +125,19 @@ def security_shots(lang):
     return f'<div class="security-shots reveal">{tiles}</div>'
 
 
-def arrival_strip(lang):
-    """Four wayfinding photos at the foot of the contacts page. An empty
-    ARRIVAL["shots"] removes the whole section."""
+def arrival_strip(lang, alt=False):
+    """Four captioned wayfinding photos on the contacts page. The alt text
+    is also the caption. An empty ARRIVAL["shots"] removes the section."""
     a = getattr(C, "ARRIVAL", None)
     if not a or not a["shots"]:
         return ""
     tiles = "".join(
-        f'<div class="media-shot reveal" style="--i:{i}">'
+        f'<figure class="arrival-shot reveal" style="--i:{i}"><div class="media-shot">'
         f'<img src="{ASSET}/img/photos/{sh["file"]}" alt="{esc(sh[lang])}"'
         f' loading="lazy" decoding="async"></div>'
+        f'<figcaption aria-hidden="true">{esc(sh[lang])}</figcaption></figure>'
         for i, sh in enumerate(a["shots"]))
-    return (f'<section class="section"><div class="container">'
+    return (f'<section class="section{" section-alt" if alt else ""}" id="find-us"><div class="container">'
             f'<h2 class="center">{esc(a["heading"][lang])}</h2>'
             f'<p class="section-sub center">{esc(a["sub"][lang])}</p>'
             f'<div class="photo-strip">{tiles}</div></div></section>')
@@ -240,6 +247,13 @@ def schema_blocks(lang, page):
         "foundingDate": "2017",
         "sameAs": [S["facebook"]],
     }
+    req = getattr(C, "REQUISITES", {"rows": []})
+    legal_name = next((v for lbl, v in req["rows"] if lbl["en"] == "Company name" and v), None)
+    if legal_name:
+        business["legalName"] = legal_name
+    m = getattr(C, "MEMBERSHIP", None)
+    if m:
+        business["memberOf"] = {"@type": "Organization", "name": m["name"], "url": m["url"]}
     blocks = [json.dumps(business, ensure_ascii=False)]
 
     if page == "faq":
@@ -489,6 +503,29 @@ def dealbox_block(lang, alt=False):
   <p class="deal-note">{esc(C.H[lang]['dealbox_note'])}</p></div></section>"""
 
 
+def membership_block(lang):
+    """Rīgas Seifi's Safe Deposit Federation membership. Shows the certificate
+    scan when MEMBERSHIP["certificate"] names a file, the federation's logo
+    until then. The link goes to the federation's member list, which names
+    Rīgas Seifi, so the claim can be checked."""
+    m = getattr(C, "MEMBERSHIP", None)
+    if not m:
+        return ""
+    cert = m.get("certificate")
+    if cert:
+        src = f"{ASSET}/img/{cert}"
+        media = (f'<a class="membership-media cert" href="{src}" target="_blank" rel="noopener">'
+                 f'<img src="{src}" alt="{esc(m["cert_alt"][lang])}" loading="lazy"></a>')
+    else:
+        media = (f'<a class="membership-media" href="{esc(m["url"])}" target="_blank" rel="noopener" title="{esc(m["name"])}">'
+                 f'<img src="{ASSET}/img/{m["logo"]}" alt="{esc(m["name"])}" loading="lazy"></a>')
+    return (f'<div class="membership reveal">{media}<div class="membership-text">'
+            f'<span class="label">{esc(m["label"][lang])}</span>'
+            f'<h2>{esc(m["heading"][lang])}</h2><p>{esc(m["body"][lang])}</p>'
+            f'<a class="membership-link" href="{esc(m["members_url"])}" target="_blank" rel="noopener">'
+            f'{esc(m["link"][lang])} <span aria-hidden="true">→</span></a></div></div>')
+
+
 def partners_block(lang, alt=True):
     tiles = []
     for p in C.PARTNERS:
@@ -497,8 +534,34 @@ def partners_block(lang, alt=True):
         tiles.append(f'<a class="partner reveal" href="{esc(p["url"])}" target="_blank" '
                      f'rel="noopener" title="{esc(p["name"])}">{inner}</a>')
     return (f'<section class="partners section{" section-alt" if alt else ""}"><div class="container">'
+            f'{membership_block(lang)}'
             f'<h2 class="center">{esc(C.H[lang]["partners"])}</h2>'
             f'<div class="partner-row">{"".join(tiles)}</div></div></section>')
+
+def video_block(lang):
+    """The home-page video. A local .mp4 (VIDEO["file"]) wins over an embed
+    URL (VIDEO["embed"]); with neither, the poster carries a "coming soon"
+    note so the slot is visibly reserved. VIDEO["show"] = False drops it."""
+    v = getattr(C, "VIDEO", None)
+    if not v or not v.get("show"):
+        return ""
+    poster = f"{ASSET}/img/photos/{v['poster']}" if v.get("poster") else ""
+    if v.get("file"):
+        poster_attr = f' poster="{poster}"' if poster else ""
+        inner = (f'<video controls preload="metadata" playsinline{poster_attr}>'
+                 f'<source src="{ASSET}/video/{esc(v["file"])}" type="video/mp4"></video>')
+    elif v.get("embed"):
+        inner = (f'<iframe src="{esc(v["embed"])}" title="{esc(v["title"][lang])}" loading="lazy" '
+                 f'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" '
+                 f'referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>')
+    else:
+        img = f'<img src="{poster}" alt="" loading="lazy" decoding="async">' if poster else ""
+        inner = (f'<div class="video-soon">{img}<div class="video-soon-note">'
+                 f'<span class="play-ring">{icon("play")}</span><p>{esc(v["soon"][lang])}</p></div></div>')
+    return (f'<section class="video section section-dark" id="video"><div class="container">'
+            f'<h2 class="center">{esc(v["heading"][lang])}</h2>'
+            f'<div class="video-frame reveal">{inner}</div></div></section>')
+
 
 def location_block(lang, heading=True, alt=True):
     u = C.UI[lang]
@@ -590,8 +653,9 @@ def hero(lang):
 <div class="stat-band"><div class="container"><ul>{stats}</ul></div></div>"""
 
 def body_index(lang):
-    # order follows the 2025 copy deck: why us -> prices -> security -> how -> privacy
-    return (hero(lang) + trust_block(lang) + size_cards(lang) + security_block(lang)
+    # order follows the 2025 copy deck: why us -> prices -> security -> how -> privacy,
+    # with the video slot between "why us" and the prices
+    return (hero(lang) + trust_block(lang) + video_block(lang) + size_cards(lang) + security_block(lang)
             + steps(lang, alt=True) + privacy_block(lang) + partners_block(lang)
             + location_block(lang, alt=False) + faq_accordion(lang, limit=5, alt=True) + book_section(lang))
 
@@ -651,10 +715,49 @@ def body_faq(lang):
     return (breadcrumb(lang, "faq") + page_hero(lang, C.H[lang]["faq"], sub)
             + faq_accordion(lang, heading=False) + book_section(lang))
 
+def contact_details(lang):
+    """Contacts page opener: address, hours, phones and email as labelled
+    cards beside the map. The booking form used to come first and pushed all
+    of this below the fold."""
+    u = C.UI[lang]
+    def card(i, ic, label, main, extra=""):
+        return (f'<div class="contact-card reveal" style="--i:{i}"><div class="adv-icon">{icon(ic)}</div>'
+                f'<span class="label">{esc(label)}</span><p class="contact-main">{main}</p>{extra}</div>')
+    cards = (
+        card(0, "pin", u["lbl_address"], esc(S["address"]),
+             f'<a class="contact-link" target="_blank" rel="noopener" href="{maps_dir()}">{esc(u["cta_route"])} <span aria-hidden="true">→</span></a>')
+        + card(1, "clock", u["footer_hours"], esc(u["hours_week"]),
+               f'<p class="contact-note">{esc(u["hours_after"])}</p>')
+        + card(2, "phone", u["lbl_phone"],
+               f'<a href="tel:{S["phone1_href"]}" data-track="phone_click">{esc(S["phone1"])}</a><br>'
+               f'<a href="tel:{S["phone2_href"]}" data-track="phone_click">{esc(S["phone2"])}</a>',
+               f'<a class="contact-link" target="_blank" rel="noopener" href="{esc(wa_href(lang))}" data-track="whatsapp_click">{esc(u["cta_wa"])} <span aria-hidden="true">→</span></a>')
+        + card(3, "mail", u["lbl_email"], f'<a href="mailto:{S["email"]}">{esc(S["email"])}</a>'))
+    return (f'<section class="contact section" id="location"><div class="container contact-inner">'
+            f'<div class="contact-cards">{cards}</div>'
+            f'<div class="location-map contact-map reveal"><iframe title="Map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" '
+            f'src="https://www.google.com/maps?q={S["maps_q"]}&output=embed"></iframe></div>'
+            f'</div></section>')
+
+
+def requisites_block(lang):
+    """Company details from the Register of Enterprises. Rows with an empty
+    value (the bank details, until supplied) are skipped."""
+    r = getattr(C, "REQUISITES", None)
+    if not r:
+        return ""
+    rows = "".join(f'<div class="req-row"><dt>{esc(lbl[lang])}</dt><dd>{esc(val)}</dd></div>'
+                   for lbl, val in r["rows"] if val)
+    return (f'<section class="section" id="requisites"><div class="container req-container">'
+            f'<h2 class="center">{esc(r["heading"][lang])}</h2>'
+            f'<dl class="req-list reveal">{rows}</dl></div></section>')
+
+
 def body_contacts(lang):
     sub = {'lv':'Sazinieties ar mums vai rezervējiet seifu tiešsaistē.','ru':'Свяжитесь с нами или забронируйте сейф онлайн.','en':'Get in touch or book your box online.'}[lang]
     return (breadcrumb(lang, "contacts") + page_hero(lang, C.UI[lang]["nav"]["contacts"], sub)
-            + book_section(lang) + location_block(lang, heading=True) + arrival_strip(lang))
+            + contact_details(lang) + arrival_strip(lang, alt=True) + requisites_block(lang)
+            + book_section(lang))
 
 def body_blog(lang):
     bl = C.BLOG[lang]

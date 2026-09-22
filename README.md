@@ -55,7 +55,7 @@ Counters preserve their rendered text exactly — years (`2017`) and composite
 values (`24/7`) are skipped on purpose, and the original string is restored
 on the final frame.
 
-## Security section: four photos, no video
+## Security section: four photos
 The column beside the security copy held a single panel with a play button,
 reserved for a security video. No video was ever filmed, so the play button
 promised something that did not exist and the panel left the column half
@@ -63,15 +63,54 @@ empty. It now carries `SECURITY_SHOTS` from content.py — four 4:5 tiles in a
 2x2 grid that follow the copy beside them, being the vault, the mechanical
 key, the electronic PIN, and the boxes. Empty that list and the block falls
 back to the "photo goes here" panel. `PLAY_SVG`, the `video` media kind and
-the `.play-badge` rules were removed with it.
+the `.play-badge` rules were removed with it. The video that is now being
+made has its own section on the home page (see Video).
 
-## Contacts page: the arrival strip
-The contacts page carried no photographs, so `ARRIVAL` in content.py adds a
-four-across strip under the map, running in the order a visitor meets them —
-the neighbourhood, Kaļķu iela, the door plate with the intercom, and the sign
-with the opening hours. The tiles are 3:2, matching the source frames, so the
-lettering on the two signs is never cropped. Empty `ARRIVAL["shots"]` and the
-whole section disappears.
+## Contacts page
+The page opens with four labelled cards (address with a route link, opening
+hours, both phones with a WhatsApp link, email) beside the map. The booking
+form used to come first and pushed all of this below the fold; it now closes
+the page, as on every other page. Below the map, `ARRIVAL` in content.py adds
+four captioned photos in the order a visitor meets them — the building,
+Kaļķu iela, the door plate with the intercom, and the sign with the opening
+hours. The tiles are 3:2, matching the source frames, so the lettering on the
+two signs is never cropped, and each alt text doubles as the caption. Empty
+`ARRIVAL["shots"]` and that section disappears.
+
+`REQUISITES` supplies the company details block (legal name, registration
+number, registered address) from the Register of Enterprises, checked 22
+September 2026. Rows with an empty value are skipped, so the bank name, IBAN
+and SWIFT appear as soon as they are typed in.
+
+## September 2026 review (v21)
+Changes made from the owners' comments on the draft:
+- **Access protection.** There is no time-delay lock. The three levels are
+  the guard's mechanical key, the client's mechanical key and the electronic
+  PIN (`SECGROUPS`, `SECLOCKS`). The FAQ answer on who can open a box now
+  says the client's key and PIN, since the vault holds the guard key.
+- **Wording.** "то, что нельзя потерять" became "то, что не хочется
+  потерять" (LV and EN mirrored), and "без банковских процедур" became "без
+  открытия банковского счёта", with "У нас удобнее и безопаснее, чем в
+  банке" added to the FAQ answer.
+- **Safe Deposit Federation.** Rīgas Seifi is a member, so SDF left the
+  partner row and got its own card at the top of the partners section
+  (`MEMBERSHIP`), linked to the federation's member list, which names Rīgas
+  Seifi. It is also `memberOf` in the LocalBusiness schema. Set
+  `MEMBERSHIP["certificate"]` to the scan's filename and the card shows the
+  certificate instead of the logo.
+- **Hero.** The home hero shows the façade of Kaļķu iela 26 (frame 13),
+  cropped with `"pos"` so the K26 building stays in frame. Phones now get the
+  hero photo too, under the buttons.
+- **Video.** A slot on the home page between "why us" and the prices
+  (`VIDEO`). Until a source is set it shows the vault-aisle frame with a
+  "coming soon" note; `"show": False` hides it.
+
+## Video
+Fill one source in `VIDEO` in content.py. `"file"` takes an .mp4 placed in
+`assets/video/` (keep it under about 50 MB, since GitHub Pages refuses files
+over 100 MB and large files slow the page). `"embed"` takes a YouTube or
+Vimeo embed URL, which is the better choice for anything long. The frame is
+16:9.
 
 ## Logo and favicon
 The house mark is the two crossed keys, redrawn as vector from the brass
@@ -148,14 +187,24 @@ Structural consequences of that deck:
 - The old three-photo "Advantages" block was dropped from the home page; its
   heading now belongs to the "Why clients choose us" block, which carries the
   seven cards from the deck.
-- Home order is: hero → why us → prices → security → how it works →
-  confidentiality → partners → location → FAQ → CTA.
+- Home order is: hero → why us → video → prices → security → how it works →
+  confidentiality → SDF membership + partners → location → FAQ → CTA.
 - New blocks: confidentiality (home), additional-services fee table (boxes),
   The Deal Box step-by-step (services), vault photo pair (about).
 - Unregistered clients are no longer described as paying "double the rate";
   the deck says they rent at an individual rate.
 
 ## Still TODO before launch
+- **SDF certificate scan.** Put it in `assets/img/` and set
+  `MEMBERSHIP["certificate"]`.
+- **Bank details** for the requisites block (`REQUISITES`, empty rows).
+- **Registered address.** The register still lists Ģertrūdes iela 33/35-1,
+  the old premises. Confirm it is current, or update `REQUISITES` once the
+  register is changed.
+- **VAT wording.** The register shows the company excluded from the VAT
+  register on 3 June 2025, while `H[...]["extras_note"]` says all prices
+  include VAT. One of the two needs correcting.
+- **The video** — set `VIDEO["file"]` or `VIDEO["embed"]`.
 - **Confirm the postcode** for Kaļķu iela 26 — `SITE["postcode"]` is set to
   LV-1050 (Vecrīga); it goes into the LocalBusiness schema.
 - **Real photos.** Thirteen frames from the 28 August 2026 shoot of Kaļķu

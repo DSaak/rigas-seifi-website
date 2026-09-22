@@ -911,6 +911,90 @@ summary:hover { color: var(--gold-dark); }
 .book.section { padding: var(--section-y-lg) 0; }
 .section-alt { border-top-color: rgba(226,222,214,.8); border-bottom-color: rgba(226,222,214,.8); }
 
+/* =====================================================================
+   SEPTEMBER 2026 REVIEW
+   The façade hero on phones as well, the Safe Deposit Federation
+   membership card, the home-page video slot, and the contacts page
+   rebuilt around labelled contact cards, captioned photos and the
+   company details.
+   ===================================================================== */
+
+/* Hero. The photo is now the building's façade, which tells a first-time
+   visitor where to go, so phones get it too, under the buttons. */
+@media (max-width: 899px) {
+  .hero-media { display: block; }
+  .hero-media .media-shot.tall { height: 240px; }
+}
+
+/* ---------- SDF membership, at the top of the partners section ---------- */
+.membership {
+  position: relative; overflow: hidden; display: grid; gap: 1.5rem; align-items: center;
+  max-width: 920px; margin: 0 auto calc(var(--section-y) * 1.1);
+  background: #fff; border: 1px solid var(--border); border-radius: 14px;
+  padding: 1.8rem 1.6rem; box-shadow: var(--e1);
+}
+.membership::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gold); }
+.membership-media { display: grid; place-items: center; }
+.membership-media img { max-height: 110px; width: auto; }
+.membership-media.cert img { max-height: 260px; border-radius: 6px; box-shadow: var(--e2); }
+.membership-text h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); margin: .35rem 0 .6rem; }
+.membership-text p { color: var(--ink); font-size: .98rem; max-width: 58ch; }
+.membership-link { display: inline-block; margin-top: .9rem; font-weight: 500; font-size: .95rem; }
+@media (min-width: 720px) {
+  .membership { grid-template-columns: 220px 1fr; gap: 2.4rem; padding: 2.2rem 2.4rem; }
+}
+
+/* ---------- Video slot (home, between "why us" and the prices) ---------- */
+.video > .container { position: relative; z-index: 1; }
+.video-frame {
+  position: relative; max-width: 960px; margin-inline: auto; aspect-ratio: 16 / 9;
+  border-radius: 14px; overflow: hidden; background: #0b1832; box-shadow: var(--e3);
+}
+.video-frame video, .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+.video-frame video { background: #000; }
+/* until the film is delivered: the vault aisle, dimmed, with a quiet note */
+.video-soon, .video-soon img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.video-soon img { object-fit: cover; }
+.video-soon::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(15,32,68,.38), rgba(15,32,68,.74)); }
+.video-soon-note { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: .9rem; padding: 1rem; text-align: center; }
+.play-ring { width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center;
+  border: 1.5px solid rgba(201,168,76,.8); background: rgba(15,32,68,.45); color: var(--gold);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.play-ring svg { width: 30px; height: 30px; margin-left: 4px; }
+.video-soon-note p { font: 500 .8rem var(--sans); letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.88); }
+@media (max-width: 599px) { .play-ring { width: 58px; height: 58px; } .play-ring svg { width: 24px; height: 24px; } }
+
+/* ---------- Contacts: labelled cards beside the map ---------- */
+.contact-inner { display: grid; gap: 1.6rem; }
+.contact-cards { display: grid; gap: 1rem; }
+@media (min-width: 560px) { .contact-cards { grid-template-columns: repeat(2, 1fr); } }
+.contact-card { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.4rem 1.4rem 1.5rem; box-shadow: var(--e1); }
+.contact-card .adv-icon { margin-bottom: .9rem; }
+.contact-card .label { margin-bottom: .25rem; }
+.contact-main { font: 500 1.1rem/1.55 var(--sans); color: var(--navy); }
+.contact-main a { color: var(--navy); }
+.contact-main a:hover { color: var(--gold-dark); }
+.contact-note { color: var(--silver); font-size: .9rem; margin-top: .2rem; }
+.contact-link { margin-top: auto; padding-top: .8rem; font-size: .92rem; font-weight: 500; }
+.contact-map { display: flex; }
+.contact-map iframe { flex: 1; height: auto; min-height: 340px; }
+@media (min-width: 960px) { .contact-inner { grid-template-columns: 1.15fr 1fr; align-items: stretch; } }
+
+/* captions under the wayfinding photos */
+.arrival-shot figcaption { margin-top: .6rem; color: var(--ink); font-size: .88rem; text-align: center; }
+
+/* ---------- Company details ---------- */
+.req-container { max-width: 760px; }
+.req-list { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--e1); }
+.req-row { display: grid; gap: .15rem; padding: 1rem 1.4rem; border-bottom: 1px solid var(--border); }
+.req-row:last-child { border-bottom: 0; }
+.req-row dt { color: var(--silver); font-size: .86rem; }
+.req-row dd { color: var(--navy); font-weight: 500; }
+@media (min-width: 600px) { .req-row { grid-template-columns: 220px 1fr; gap: 1.5rem; align-items: baseline; } }
+
 /* ---------- Respect reduced motion: everything above goes still ---------- */
 @media (prefers-reduced-motion: reduce) {
   .reveal, .reveal.in { opacity: 1; transform: none; filter: none; transition: none; }

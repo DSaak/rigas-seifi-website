@@ -93,6 +93,7 @@ UI = {
         "f_privacy": "Nosūtot formu, jūs piekrītat personas datu apstrādei saskaņā ar privātuma politiku.",
         "f_ok_t": "Paldies!", "f_ok_p": "Jūsu pieteikums saņemts. Sazināsimies vienas darba dienas laikā.",
         "or_call": "vai zvaniet:",
+        "lbl_address": "Adrese", "lbl_phone": "Tālrunis", "lbl_email": "E-pasts",
     },
     "ru": {
         "nav": {"boxes": "Ячейки и цены", "security": "Безопасность", "services": "Услуги",
@@ -116,6 +117,7 @@ UI = {
         "f_privacy": "Отправляя форму, вы соглашаетесь с обработкой персональных данных согласно политике конфиденциальности.",
         "f_ok_t": "Спасибо!", "f_ok_p": "Заявка получена. Свяжемся с вами в течение одного рабочего дня.",
         "or_call": "или звоните:",
+        "lbl_address": "Адрес", "lbl_phone": "Телефон", "lbl_email": "Эл. почта",
     },
     "en": {
         "nav": {"boxes": "Boxes & prices", "security": "Security", "services": "Services",
@@ -139,6 +141,7 @@ UI = {
         "f_privacy": "By submitting you agree to the processing of personal data under our privacy policy.",
         "f_ok_t": "Thank you!", "f_ok_p": "Your request has been received. We will contact you within one business day.",
         "or_call": "or call:",
+        "lbl_address": "Address", "lbl_phone": "Phone", "lbl_email": "Email",
     },
 }
 
@@ -165,7 +168,7 @@ META = {
                      "Divas pazemes dzelzsbetona glabātavas, Rosengrens aprīkojums, bruņotas durvis, video novērošana un diennakts bruņota apsardze.",
                      "seifu drošība, bankas līmeņa drošība, Rosengrens, apsardze Rīgā"),
         "how": ("Kā tas notiek — seifa noma 3 soļos | Rīgas Seifi",
-                "Izvēlieties izmēru, parakstiet līgumu 10 minūtēs un glabājiet droši. Bez bankas procedūrām. Reģistrēts un anonīms klients.",
+                "Izvēlieties izmēru, parakstiet līgumu 10 minūtēs un glabājiet droši. Bez bankas konta atvēršanas. Reģistrēts un anonīms klients.",
                 "kā nomāt seifu, seifa līgums, seifa noma soļi"),
         "services": ("Pakalpojumi — seifu noma, The Deal Box, transports | Rīgas Seifi",
                      "Seifu noma, 24/7 piekļuve, darījumu seifs (The Deal Box), apsargāta vērtslietu pārvešana un konfidenciāla sapulču telpa.",
@@ -194,7 +197,7 @@ META = {
                      "Два подземных железобетонных хранилища, оборудование Rosengrens, бронедвери, видеонаблюдение и круглосуточная вооружённая охрана.",
                      "безопасность сейфа, банковский уровень защиты, Rosengrens, охрана Рига"),
         "how": ("Как это работает — аренда сейфа за 3 шага | Rīgas Seifi",
-                "Выберите размер, подпишите договор за 10 минут и храните спокойно. Без банковских процедур. Два уровня конфиденциальности на выбор.",
+                "Выберите размер, подпишите договор за 10 минут и храните спокойно. Без открытия банковского счёта. Два уровня конфиденциальности на выбор.",
                 "как арендовать сейф, договор аренды сейфа, шаги аренды"),
         "services": ("Услуги — аренда сейфов, The Deal Box, транспорт | Rīgas Seifi",
                      "Аренда сейфов, доступ 24/7, сейф для сделок (The Deal Box), охраняемая перевозка ценностей и конфиденциальная переговорная.",
@@ -223,7 +226,7 @@ META = {
                      "Two underground reinforced-concrete vaults, Rosengrens equipment, armoured doors, video surveillance and round-the-clock armed security.",
                      "safe deposit security, bank-grade security, Rosengrens, armed guards riga"),
         "how": ("How It Works — rent a safe box in 3 steps | Rīgas Seifi",
-                "Choose a size, sign the agreement in 10 minutes and store with confidence. No bank procedures. Registered and anonymous clients.",
+                "Choose a size, sign the agreement in 10 minutes and store with confidence. No bank account needed. Registered and anonymous clients.",
                 "how to rent a safe box, safe rental agreement, deposit box steps"),
         "services": ("Services — safe rental, The Deal Box, transport | Rīgas Seifi",
                      "Safe deposit rental, 24/7 access, escrow safe (The Deal Box), guarded transport of valuables and a confidential meeting room.",
@@ -258,7 +261,10 @@ STEPS = {
            ("Your valuables are guarded", "Access during business hours, evenings and 24/7 — by arrangement.")],
 }
 
-# Security section on the home page: the vault, then the triple lock on every box.
+# Security section on the home page: the vault, then the three levels that
+# protect access to every box. They are the guard's mechanical key, the
+# client's mechanical key and the electronic PIN. There is no time-delay lock;
+# an earlier draft listed a "lock timer", which the business corrected.
 # **double asterisks** render as bold.
 SECGROUPS = {
     "lv": [
@@ -269,10 +275,10 @@ SECGROUPS = {
             "Trokšņa un vibrācijas detektori sienās",
             "Video novērošana un ugunsdrošības sistēma",
             "Diennakts bruņota apsardze SP Leģions ar ātrās reaģēšanas vienību"]),
-        ("Trīskārša aizsardzība katram seifam", [
-            "Mehāniskā slēdzene — klasiskā atslēga",
-            "Elektroniskā slēdzene — PIN ar AES šifrēšanu, 100 000 000 kombināciju. Pēc 3 kļūdainiem mēģinājumiem — automātiska bloķēšana",
-            "Bloķēšanas taimeris — durvis neatvērsies pat ar pareizo atslēgu, kamēr nav pagājis iestatītais laiks"]),
+        ("Piekļuve seifam — trīs aizsardzības līmeņi", [
+            "Apsardzes mehāniskā atslēga — atrodas glabātavā",
+            "Jūsu mehāniskā atslēga — tiek izsniegta tikai jums",
+            "Elektroniskais PIN kods — AES šifrēšana, 100 000 000 kombināciju. Pēc 3 kļūdainiem mēģinājumiem — automātiska bloķēšana"]),
     ],
     "ru": [
         ("Хранилище", [
@@ -282,10 +288,10 @@ SECGROUPS = {
             "Детекторы шума и вибрации в стенах",
             "Видеонаблюдение и система пожарной безопасности",
             "Круглосуточная вооружённая охрана SP Leģions с группой быстрого реагирования"]),
-        ("Тройная защита каждой ячейки", [
-            "Механический замок — классический ключ",
-            "Электронный замок — PIN с AES-шифрованием, 100 000 000 комбинаций. После 3 неверных попыток — автоматическая блокировка",
-            "Таймер блокировки — дверь не откроется даже правильным ключом, пока не истечёт установленное время"]),
+        ("Доступ в ячейку защищён тремя уровнями", [
+            "Механический ключ охраны — находится в хранилище",
+            "Ваш механический ключ — выдаётся только вам",
+            "Электронный PIN-код — AES-шифрование, 100 000 000 комбинаций. После 3 неверных попыток — автоматическая блокировка"]),
     ],
     "en": [
         ("The vault", [
@@ -295,29 +301,29 @@ SECGROUPS = {
             "Noise and vibration detectors inside the walls",
             "Video surveillance and a fire-safety system",
             "Round-the-clock armed security by SP Leģions with a rapid-response team"]),
-        ("Triple protection on every box", [
-            "Mechanical lock — a classic key",
-            "Electronic lock — AES-encrypted PIN, 100,000,000 combinations. After 3 wrong attempts — an automatic lockout",
-            "Lock timer — the door will not open even with the right key until the set time has passed"]),
+        ("Three levels protect access to every box", [
+            "The guard's mechanical key — kept at the vault",
+            "Your mechanical key — issued to you alone",
+            "Electronic PIN — AES encryption, 100,000,000 combinations. After 3 wrong attempts — an automatic lockout"]),
     ],
 }
 
-# Security page only: the same triple protection spelled out row by row.
+# Security page only: the same three levels spelled out row by row.
 SECLOCKS = {
     "lv": [
-        ("Mehāniskā slēdzene", "Klasiskā atslēga — pirmā aizsardzības robeža."),
-        ("Elektroniskā slēdzene", "PIN ar AES šifrēšanu un aizsardzību pret koda pārtveršanu. 100 000 000 kombināciju. Pēc 3 kļūdainiem mēģinājumiem — bloķēšana uz 5 minūtēm, pēc tam ilgāk."),
-        ("Bloķēšanas taimeris", "Durvis neatvērsies pat ar pareizo atslēgu, kamēr nav pagājis iestatītais laiks. Unikāla aizsardzība pret piespiedu atvēršanu."),
+        ("Apsardzes mehāniskā atslēga", "Pirmā atslēga atrodas pie glabātavas apsardzes un ir vajadzīga katrā seifa atvēršanas reizē."),
+        ("Jūsu mehāniskā atslēga", "Otro atslēgu saņemat tikai jūs. Seifs atveras ar abām atslēgām kopā."),
+        ("Elektroniskais PIN kods", "PIN ar AES šifrēšanu un aizsardzību pret koda pārtveršanu. 100 000 000 kombināciju. Pēc 3 kļūdainiem mēģinājumiem — bloķēšana uz 5 minūtēm, pēc tam ilgāk."),
     ],
     "ru": [
-        ("Механический замок", "Классический ключ — первый рубеж защиты."),
-        ("Электронный замок", "PIN с AES-шифрованием и защитой от перехвата кода. 100 000 000 комбинаций. После 3 неверных попыток — блокировка на 5 минут, затем дольше."),
-        ("Таймер блокировки", "Дверь не откроется даже правильным ключом, пока не истечёт установленное время. Уникальная защита от принудительного вскрытия."),
+        ("Механический ключ охраны", "Первый ключ находится у охраны хранилища и нужен при каждом открытии ячейки."),
+        ("Ваш механический ключ", "Второй ключ выдаётся только вам. Ячейка открывается двумя ключами вместе."),
+        ("Электронный PIN-код", "PIN с AES-шифрованием и защитой от перехвата кода. 100 000 000 комбинаций. После 3 неверных попыток — блокировка на 5 минут, затем дольше."),
     ],
     "en": [
-        ("Mechanical lock", "A classic key — the first line of defence."),
-        ("Electronic lock", "An AES-encrypted PIN with protection against code interception. 100,000,000 combinations. After 3 wrong attempts — a 5-minute lockout, then longer."),
-        ("Lock timer", "The door will not open even with the right key until the set time has passed. A unique defence against a forced opening."),
+        ("The guard's mechanical key", "The first key stays with the vault's security staff and is needed every time a box is opened."),
+        ("Your mechanical key", "The second key is issued to you alone. The box opens with both keys together."),
+        ("Electronic PIN", "An AES-encrypted PIN with protection against code interception. 100,000,000 combinations. After 3 wrong attempts — a 5-minute lockout, then longer."),
     ],
 }
 
@@ -345,7 +351,7 @@ TRUST = {
             ("shield", "Kopš 2017. gada", "Atvērāmies brīdī, kad bankas sāka slēgt seifu nodaļas. Šodien — lielākā privātā glabātava Baltijā."),
             ("box", "3000+ seifu, pieci izmēri", "No plānas dokumentu mapes līdz lielām vērtslietām un mākslas darbiem."),
             ("lock", "Bez banku ierobežojumiem", "Nekādu kontu, izziņu un bankas darba laika. Jūsu piekļuve — pēc jūsu grafika."),
-            ("users", "1000+ klientu 9 gados", "Privātpersonas, uzņēmumi, notāri, nekustamā īpašuma darījumu dalībnieki — uztic mums to, ko nedrīkst pazaudēt."),
+            ("users", "1000+ klientu 9 gados", "Privātpersonas, uzņēmumi, notāri, nekustamā īpašuma darījumu dalībnieki — uztic mums to, ko negribas pazaudēt."),
             ("deal", "Deal Box", "Rīgas Seifi ir neitrāls darījuma garants — atslēgas tiek izsniegtas tikai tad, kad izpildīti līguma nosacījumi."),
             ("truck", "Apsargāts transfērs", "Organizējam drošu vērtslietu piegādi uz glabātavu vai mājās — nosacījumus saskaņojam individuāli."),
             ("room", "Sarunu telpa", "Konfidenciāla telpa dokumentu parakstīšanai turpat glabātavā. Bez video novērošanas iekšpusē."),
@@ -357,7 +363,7 @@ TRUST = {
             ("shield", "С 2017 года", "Открылись, когда банки начали закрывать сейфовые отделения. Сегодня — крупнейшее частное хранилище в Балтии."),
             ("box", "3000+ ячеек, пять размеров", "От тонкой папки с документами до крупных ценностей и предметов искусства."),
             ("lock", "Без банковских ограничений", "Никаких счетов, справок и графика работы банка. Ваш доступ — по вашему расписанию."),
-            ("users", "1000+ клиентов за 9 лет", "Частные лица, компании, нотариусы, участники сделок с недвижимостью — доверяют нам то, что нельзя потерять."),
+            ("users", "1000+ клиентов за 9 лет", "Частные лица, компании, нотариусы, участники сделок с недвижимостью — доверяют нам то, что не хочется потерять."),
             ("deal", "Deal Box", "Rīgas Seifi выступает нейтральным гарантом сделки — ключи выдаются только при выполнении условий договора."),
             ("truck", "Охраняемый трансфер", "Организуем безопасную доставку ценностей до хранилища или домой — условия индивидуально."),
             ("room", "Переговорная комната", "Конфиденциальное пространство для подписания документов прямо в хранилище. Без видеонаблюдения внутри."),
@@ -369,7 +375,7 @@ TRUST = {
             ("shield", "Since 2017", "We opened when banks started closing their safe deposit departments. Today we are the largest private vault in the Baltics."),
             ("box", "3,000+ boxes, five sizes", "From a slim folder of documents to large valuables and works of art."),
             ("lock", "No banking restrictions", "No accounts, no certificates, no banking hours. Your access runs on your schedule."),
-            ("users", "1,000+ clients in 9 years", "Private individuals, companies, notaries and parties to property deals trust us with what cannot be lost."),
+            ("users", "1,000+ clients in 9 years", "Private individuals, companies, notaries and parties to property deals trust us with what they would rather not lose."),
             ("deal", "Deal Box", "Rīgas Seifi acts as the neutral guarantor of a transaction — the keys are released only once the terms of the agreement are met."),
             ("truck", "Guarded transfer", "We arrange secure delivery of valuables to the vault or to your home — terms agreed individually."),
             ("room", "Meeting room", "A confidential space for signing documents right inside the vault. No video surveillance inside."),
@@ -379,6 +385,8 @@ TRUST = {
 
 # =====================================================================
 #  PHOTOS  —  slot -> file in assets/img/photos/ + alt text per language.
+#  The hero shows the façade of Kaļķu iela 26, so a first-time visitor sees
+#  the building before the vault (asked for in the September 2026 review).
 #  Source: the 28 August 2026 shoot of the Kaļķu iela 26 premises
 #  (127 frames). Everything here is a full-resolution frame from that
 #  shoot, resized for the web, except "about1", which is captioned
@@ -388,10 +396,11 @@ TRUST = {
 #  "photo goes here" panel automatically.
 # =====================================================================
 PHOTOS = {
-    "hero": {"file": "vault-aisle.jpg",  # frame 116,
-             "lv": "Glabātavas eja ar seifiem abās pusēs",
-             "ru": "Проход в хранилище с ячейками по обеим сторонам",
-             "en": "The vault aisle, lined with safe deposit boxes on both sides"},
+    "hero": {"file": "riga-centre.jpg",  # frame 13, the K26 façade
+             "pos": "66% 50%",  # the K26 building sits right of centre in the frame
+             "lv": "Ēka Kaļķu ielā 26 Vecrīgā",
+             "ru": "Здание на Kaļķu iela 26 в Старой Риге",
+             "en": "The building at Kaļķu iela 26 in Old Riga"},
     "step1": {"file": "box-sizes.jpg",  # frame 126,
              "lv": "Pieci seifu izmēri blakus — no mazākā līdz lielākajam",
              "ru": "Пять размеров ячеек рядом — от меньшего к большему",
@@ -445,10 +454,11 @@ SECURITY_SHOTS = [
 ]
 
 # =====================================================================
-#  ARRIVAL  —  the photo strip at the foot of the contacts page. Four
-#  shots in the order a visitor meets them, being the neighbourhood, the
-#  street, the door plate with the intercom, and the sign with the
-#  opening hours. Empty "shots" and the whole block disappears.
+#  ARRIVAL  —  the photo strip on the contacts page. Four shots in the
+#  order a visitor meets them, being the building, the street, the door
+#  plate with the intercom, and the sign with the opening hours. Each alt
+#  text doubles as the visible caption. Empty "shots" and the whole block
+#  disappears.
 # =====================================================================
 ARRIVAL = {
     "heading": {"lv": "Kā mūs atrast",
@@ -459,9 +469,9 @@ ARRIVAL = {
             "en": "What to look for when you arrive."},
     "shots": [
         {"file": "riga-centre.jpg",  # frame 13
-         "lv": "Apkaime Rīgas centrā",
-         "ru": "Район в центре Риги",
-         "en": "The neighbourhood in central Riga"},
+         "lv": "Ēka Kaļķu ielā 26",
+         "ru": "Здание на Kaļķu iela 26",
+         "en": "The building at Kaļķu iela 26"},
         {"file": "street-kalku.jpg",  # frame 16
          "lv": "Kaļķu iela, kur atrodas ieeja",
          "ru": "Улица Kaļķu iela, где находится вход",
@@ -477,12 +487,91 @@ ARRIVAL = {
     ],
 }
 
-# Partners (logo file in assets/img/, or None until the logo is supplied)
+# Partners (logo file in assets/img/, or None until the logo is supplied).
+# The Safe Deposit Federation used to sit in this row. Rīgas Seifi is a
+# member, so it now has its own block (MEMBERSHIP, below).
 PARTNERS = [
     {"name": "Money Express", "url": "https://www.moneyexpress.lv/", "logo": "partner-money-express.svg"},
     {"name": "SP Leģions", "url": "https://legions.lv/", "logo": "partner-sp-legions.png"},
-    {"name": "Safe Deposit Federation", "url": "https://safedepositfederation.com/", "logo": "partner-sdf.png"},
 ]
+
+# =====================================================================
+#  MEMBERSHIP  —  Rīgas Seifi is a member of the Safe Deposit Federation.
+#  Shown at the top of the partners section (home, security, about) and in
+#  the LocalBusiness schema as memberOf. The federation's own member list
+#  names Rīgas Seifi under Latvia (checked 22 September 2026), and the
+#  block links to it so a visitor can verify the claim.
+#  "certificate": the scan of the membership certificate, as a file in
+#  assets/img/ (e.g. "sdf-certificate.jpg"). While it is None the block
+#  shows the federation's logo; once set, it shows the certificate and
+#  opens it full size on click.
+# =====================================================================
+MEMBERSHIP = {
+    "name": "Safe Deposit Federation",
+    "url": "https://safedepositfederation.com/",
+    "members_url": "https://safedepositfederation.com/members/",
+    "logo": "partner-sdf.png",
+    "certificate": None,
+    "label": {"lv": "Dalība", "ru": "Членство", "en": "Membership"},
+    "heading": {"lv": "Safe Deposit Federation biedrs",
+                "ru": "Член Safe Deposit Federation",
+                "en": "Member of the Safe Deposit Federation"},
+    "body": {"lv": "Rīgas Seifi ir starptautiskās seifu glabātavu federācijas Safe Deposit Federation biedrs. Dalību apliecina federācijas izsniegts sertifikāts.",
+             "ru": "Rīgas Seifi является членом международной федерации сейфовых хранилищ Safe Deposit Federation. Членство подтверждено сертификатом федерации.",
+             "en": "Rīgas Seifi is a member of the Safe Deposit Federation, the international federation of safe deposit vaults. The federation has issued a certificate confirming the membership."},
+    "link": {"lv": "Rīgas Seifi federācijas biedru sarakstā",
+             "ru": "Rīgas Seifi в списке членов федерации",
+             "en": "Rīgas Seifi in the federation's member list"},
+    "cert_alt": {"lv": "Safe Deposit Federation biedra sertifikāts, izsniegts Rīgas Seifi",
+                 "ru": "Сертификат члена Safe Deposit Federation, выданный Rīgas Seifi",
+                 "en": "Safe Deposit Federation membership certificate issued to Rīgas Seifi"},
+}
+
+# =====================================================================
+#  VIDEO  —  the video section on the home page, between "Why us" and
+#  the prices. Fill ONE of the two sources when the video is ready:
+#    "file"  — an .mp4 in assets/video/ (keep it under ~50 MB; GitHub
+#              Pages refuses files over 100 MB), or
+#    "embed" — a YouTube or Vimeo embed URL, e.g.
+#              "https://www.youtube-nocookie.com/embed/VIDEO_ID".
+#  While both are empty the section shows the poster with a "coming soon"
+#  note. "show": False hides the whole section.
+# =====================================================================
+VIDEO = {
+    "show": True,
+    "file": "",
+    "embed": "",
+    "poster": "vault-aisle.jpg",  # frame 116, the vault aisle that used to be the hero
+    "heading": {"lv": "Video par Rīgas Seifi",
+                "ru": "Видео о Rīgas Seifi",
+                "en": "Rīgas Seifi on video"},
+    "soon": {"lv": "Video drīzumā",
+             "ru": "Видео скоро появится",
+             "en": "Video coming soon"},
+    "title": {"lv": "Rīgas Seifi video", "ru": "Видео Rīgas Seifi", "en": "Rīgas Seifi video"},
+}
+
+# =====================================================================
+#  REQUISITES  —  company details on the contacts page.
+#  Source: the Latvian Register of Enterprises, via company.lursoft.lv and
+#  firmas.lv, checked 22 September 2026. The registered address there is
+#  still Ģertrūdes iela 33/35 (the old premises), which is why it differs
+#  from the visiting address. The company is not in the VAT register
+#  (excluded 3 June 2025), so no VAT number is shown.
+#  Rows with an empty value are skipped, so the bank rows appear as soon
+#  as they are filled in.
+# =====================================================================
+REQUISITES = {
+    "heading": {"lv": "Uzņēmuma rekvizīti", "ru": "Реквизиты компании", "en": "Company details"},
+    "rows": [
+        ({"lv": "Nosaukums", "ru": "Название", "en": "Company name"}, 'AS "Rīgas seifi"'),
+        ({"lv": "Reģistrācijas numurs", "ru": "Регистрационный номер", "en": "Registration number"}, "40203055925"),
+        ({"lv": "Juridiskā adrese", "ru": "Юридический адрес", "en": "Registered address"}, "Ģertrūdes iela 33/35-1, Rīga, LV-1011"),
+        ({"lv": "Banka", "ru": "Банк", "en": "Bank"}, ""),
+        ({"lv": "Konta numurs (IBAN)", "ru": "Номер счёта (IBAN)", "en": "Account number (IBAN)"}, ""),
+        ({"lv": "SWIFT", "ru": "SWIFT", "en": "SWIFT"}, ""),
+    ],
+}
 
 # hero per language: eyebrow, title, subtitle, 4 stats (value,label)
 HERO = {
@@ -644,7 +733,7 @@ ABOUT = {
         "paras": [
             "Rīgas Seifi durvis vēra 2017. gada maijā — brīdī, kad bankas visā Eiropā sāka atteikties no seifu nomas pakalpojuma. Mēs saskatījām iespēju: piedāvāt cilvēkiem to, no kā bankas atsakās, un izdarīt to labāk.",
             "Atšķirībā no bankām mēs specializējamies tikai vienā pakalpojumā — glabāšanā. Vienkārši droša un konfidenciāla vieta tam, kas mūsu klientam ir dārgs.",
-            "Astoņu gadu laikā mūs izvēlējušies vairāk nekā 1000 klientu — privātpersonas, uzņēmēji, notāri, nekustamā īpašuma darījumu dalībnieki. Cilvēki, kuri zina: ir lietas, ko nedrīkst pazaudēt.",
+            "Astoņu gadu laikā mūs izvēlējušies vairāk nekā 1000 klientu — privātpersonas, uzņēmēji, notāri, nekustamā īpašuma darījumu dalībnieki. Cilvēki, kuri zina: ir lietas, ko negribas pazaudēt.",
             "2026. gadā mēs pārcēlāmies uz Vecrīgu. Jaunā adrese — Kaļķu iela 26 — nav tikai atrašanās vietas maiņa: modernākas telpas, pastiprināta aizsardzība un labāks serviss tiem, kas uztic mums pašu vērtīgāko.",
         ],
         "facts": [("2017", "dibināšanas gads"), ("3000+", "seifu"), ("1000+", "klientu"), ("2", "glabātavas"), ("100+ m²", "platība")],
@@ -655,7 +744,7 @@ ABOUT = {
         "paras": [
             "Rīgas Seifi открылись в мае 2017 года — в тот момент, когда банки по всей Европе начали сворачивать услугу сейфовых ячеек. Мы увидели возможность: предложить людям то, от чего отказываются банки, и сделать это лучше.",
             "В отличие от банков, мы специализируемся только на одной услуге — на хранении. Просто надёжное, конфиденциальное место для того, что дорого нашему клиенту.",
-            "За восемь лет нас выбрали более 1000 клиентов — частные лица, предприниматели, нотариусы, участники сделок с недвижимостью. Люди, которые знают: есть вещи, которые нельзя потерять.",
+            "За восемь лет нас выбрали более 1000 клиентов — частные лица, предприниматели, нотариусы, участники сделок с недвижимостью. Люди, которые знают: есть вещи, которые не хочется потерять.",
             "В 2026 году мы переехали в Старую Ригу. Новый адрес — Kaļķu iela 26 — это не просто смена локации: более современное помещение, усиленная защита и лучший сервис для тех, кто доверяет нам самое ценное.",
         ],
         "facts": [("2017", "год основания"), ("3000+", "ячеек"), ("1000+", "клиентов"), ("2", "хранилища"), ("100+ м²", "площадь")],
@@ -666,7 +755,7 @@ ABOUT = {
         "paras": [
             "Rīgas Seifi opened in May 2017, at the moment when banks across Europe began winding down their safe deposit services. We saw an opportunity: to offer people what the banks were giving up, and to do it better.",
             "Unlike a bank, we specialise in a single service — storage. Simply a secure, confidential place for what matters to our client.",
-            "Over eight years more than 1,000 clients have chosen us — private individuals, entrepreneurs, notaries and parties to property transactions. People who know there are things you cannot afford to lose.",
+            "Over eight years more than 1,000 clients have chosen us — private individuals, entrepreneurs, notaries and parties to property transactions. People who know there are things they would rather not lose.",
             "In 2026 we moved to Old Riga. The new address — Kaļķu iela 26 — is more than a change of location: more modern premises, stronger protection and better service for those who trust us with their most valuable things.",
         ],
         "facts": [("2017", "year founded"), ("3,000+", "boxes"), ("1,000+", "clients"), ("2", "vaults"), ("100+ m²", "floor area")],
@@ -699,8 +788,8 @@ HOWX = {
 # FAQ: list of (question, answer) per language
 FAQ = {
     "lv": [
-        ("Vai man jāatver bankas konts?", "Nē. Mēs neesam banka — līgumu noslēdzam uz vietas 10 minūtēs, bez bankas procedūrām."),
-        ("Kas zina, kas atrodas manā seifā?", "Tikai jūs. Mēs saturu nepārbaudām un nereģistrējam. Atslēgas ir tikai jūsu rīcībā, un mūsu darbinieki nevar piekļūt saturam."),
+        ("Vai man jāatver bankas konts?", "Nē. Līgumu noslēdzam uz vietas 10 minūtēs, bez bankas konta atvēršanas. Pie mums ir ērtāk un drošāk nekā bankā."),
+        ("Kas zina, kas atrodas manā seifā?", "Tikai jūs. Mēs saturu nepārbaudām un nereģistrējam. Jūsu atslēga un PIN ir tikai pie jums, tāpēc mūsu darbinieki nevar piekļūt saturam."),
         ("Ko drīkst un ko nedrīkst glabāt?", "Drīkst: valūtu, dārgmetālus, rotaslietas, vērtspapīrus, dokumentus, antikvariātu, mākslu, datu nesējus. Nedrīkst: viegli uzliesmojošas, sprādzienbīstamas, toksiskas, radioaktīvas vielas un ieročus."),
         ("Kāds ir minimālais nomas termiņš?", "1 mēnesis. Ilgtermiņa līgumiem (12–24 mēneši) cena mēnesī ir ievērojami zemāka."),
         ("Vai varu piekļūt seifam ārpus darba laika?", "Jā — vakara apmeklējumi un 24/7 piekļuve pieejama pēc iepriekšējas vienošanās."),
@@ -711,8 +800,8 @@ FAQ = {
         ("Vai varu dot piekļuvi citai personai?", "Jā, nododot atslēgas, seifa numuru un PIN savam pārstāvim."),
     ],
     "ru": [
-        ("Нужно ли открывать банковский счёт?", "Нет. Мы не банк — договор подписывается на месте за 10 минут, без банковских процедур."),
-        ("Кто знает, что лежит в моей ячейке?", "Только вы. Мы не проверяем и не регистрируем содержимое. Ключи только у вас, наши сотрудники не имеют доступа к содержимому."),
+        ("Нужно ли открывать банковский счёт?", "Нет. Договор подписывается на месте за 10 минут, без открытия банковского счёта. У нас удобнее и безопаснее, чем в банке."),
+        ("Кто знает, что лежит в моей ячейке?", "Только вы. Мы не проверяем и не регистрируем содержимое. Ваш ключ и PIN-код есть только у вас, поэтому наши сотрудники не имеют доступа к содержимому."),
         ("Что можно и что нельзя хранить?", "Можно: валюту, драгметаллы, украшения, ценные бумаги, документы, антиквариат, искусство, носители данных. Нельзя: легковоспламеняющиеся, взрывоопасные, токсичные, радиоактивные вещества и оружие."),
         ("Какой минимальный срок аренды?", "1 месяц. При долгосрочных договорах (12–24 месяца) месячная ставка значительно ниже."),
         ("Можно ли попасть к ячейке вне рабочего времени?", "Да — вечерние визиты и доступ 24/7 возможны по предварительной договорённости."),
@@ -723,8 +812,8 @@ FAQ = {
         ("Можно ли дать доступ другому человеку?", "Да, передав ключи, номер ячейки и PIN своему представителю."),
     ],
     "en": [
-        ("Do I need to open a bank account?", "No. We are not a bank — the agreement is signed on site in 10 minutes, with no banking procedures."),
-        ("Who knows what is in my box?", "Only you. We do not inspect or register the contents. You hold the keys, and our staff cannot access the contents."),
+        ("Do I need to open a bank account?", "No. The agreement is signed on site in 10 minutes, with no bank account to open. Renting from us is simpler and safer than at a bank."),
+        ("Who knows what is in my box?", "Only you. We do not inspect or register the contents. Only you hold your key and PIN, so our staff cannot access the contents."),
         ("What can and cannot be stored?", "Allowed: currency, precious metals, jewellery, securities, documents, antiques, art, data media. Not allowed: flammable, explosive, toxic, radioactive substances and weapons."),
         ("What is the minimum rental term?", "1 month. Long-term agreements (12–24 months) come with a significantly lower monthly rate."),
         ("Can I access my box outside business hours?", "Yes — evening visits and 24/7 access are available by prior arrangement."),
