@@ -13,13 +13,18 @@ design/        Designer deliverables (A17 Digital moodboard PDF).
 snapshot.sh    Save a version snapshot (keeps the last 15).
 ```
 
-## Design system (from the A17 Digital moodboard, v1.0)
-Light theme: cream `#F8F6F1` page, deep navy `#0F2044` header/CTA sections,
-footer `#2D3748`, gold `#C9A84C` accents only (≤10% of screen), borders
-`#E2DED6`. Headings: Playfair Display (fallback Palatino/Georgia), weight 500.
-Body/nav/buttons: Inter. Buttons radius 4–6px, cards 8–12px.
-No red accents, no pure white, max 2 fonts, prices always open.
-All tokens are CSS variables at the top of `assets/styles.css`.
+## Design system
+Since the owners' October 2026 review the site uses **two colours only**,
+Deep Navy `#0F2044` and Warm Gold `#C9A84C`, on white. Text is navy on
+white and white on navy, and gold is kept for buttons, icons, hairline rules
+and the figures in the navy stat bands. Every navy surface is the same flat
+navy (the gradients and grain that made the header and the stat band look
+like two different blues are gone). The one exception is the green contact
+button, which the owners asked for. **One font**, Playfair Display Regular
+(400), sets everything, headings and body alike, with no bold anywhere.
+Buttons radius 4–6px, cards 8–12px, prices always open. The tokens are CSS
+variables at the top of `assets/styles.css`. This replaced the A17 Digital
+moodboard's cream page, charcoal footer, grey labels and Inter body text.
 
 **Vertical rhythm.** Every section uses `--section-y` top *and* bottom, so
 the gap between any two sections is the same. The hero and the booking CTA
@@ -105,6 +110,48 @@ Changes made from the owners' comments on the draft:
   (`VIDEO`). Until a source is set it shows the vault-aisle frame with a
   "coming soon" note; `"show": False` hides it.
 
+## October 2026 review (v23)
+From the owners' notes "коррекция сайта" (Zaneta Saakjane, 13 October 2026,
+second version after a meeting on 9 October) and the 2025 price lists in LV,
+RU and EN (forwarded 11 October). What changed:
+- **Colour and type.** Two colours and one serif in Regular, as above. The
+  `MODERNISATION LAYER` grain, glows and gradients were removed for this.
+- **Header.** White keys, SAFETY DEPOSIT BOXES under the name as on the old
+  logo (`logo()` in build.py). The phone number left the header; the
+  handset icon stays on phones and hamburger widths.
+- **Menu.** Top: boxes and prices, security, services, about, news,
+  contacts (`NAV`). The rules of use, the agents page and the FAQ moved down
+  into a footer column (`FOOTER_INFO`). The blog page is now "News"
+  (`news.html`). The rules of use link to the old site's rental-rules PDFs
+  (`RULES`). The agents page is new (`AGENTS`), with the copy of the old
+  site's "Aģentiem" page.
+- **Contact button.** The WhatsApp bubble became a green handset that opens a
+  menu of WhatsApp, both phones, Facebook, Telegram once its link is set, and
+  email (`contact_fab()`). Social links come from `SOCIAL` and appear in the
+  footer, on the contacts page and in that menu; empty rows are skipped.
+- **Hero.** New title and subtitle. The stat band reads 100% / 10 min /
+  27,50 €* / since 2017, with the asterisk explained underneath
+  (`HERO[...]["stats_note"]`). "3000+" left the band.
+- **Why us.** Seven equal cards, heading in capitals over the text, with the
+  owners' wording (`TRUST`).
+- **Boxes and prices.** Heading "Размеры ячеек и цены" and a new standfirst.
+  The box drawings (`box_svg()`) follow the real boxes, drawn to one scale
+  with height, width and length written on them. The "what fits" text is
+  gone. Cards quote the 24-month rate as the "from" price. The table has 1,
+  3, 6, 12 and 24-month columns, headed like the price list (size in mm,
+  then rental term with the monthly price), no bold, and a switch between
+  registered and unregistered clients (`TERMS`, `BOX_DATA`, `size_table()`).
+  On phones the width and length columns drop out, a note gives them, and
+  the table fits a 320px screen. "Все цены указаны с НДС" sits under the
+  cards and the table. The extras table is headed "Услуги, тарифы".
+- **Services.** The Deal Box card's "learn more" goes to the Deal Box steps
+  on the same page; the other cards still open WhatsApp.
+- **Consequential edits.** The certificates line now reads EN 1143-1 (11)
+  and EN 1300 class D, matching the owners' security text (it said class C).
+  The privacy note and how-it-works no longer call the unregistered rate
+  "individual", since the price list publishes it. Meta titles quote
+  €27,50. The key emoji left the promo ribbon.
+
 ## Video
 Fill one source in `VIDEO` in content.py. `"file"` takes an .mp4 placed in
 `assets/video/` (keep it under about 50 MB, since GitHub Pages refuses files
@@ -153,12 +200,13 @@ which is exactly what happened during the first redesign.
 python3 build.py
 ```
 Generates `docs/` with:
-- `docs/<lang>/<page>.html` for lv, ru, en (9 pages each = 27 pages)
+- `docs/<lang>/<page>.html` for lv, ru, en (10 pages each = 30 pages)
 - `docs/index.html` root that redirects to the visitor's language
 - `sitemap.xml`, `robots.txt`
 
 ## Pages
-index, boxes, security, how-it-works, services, about, faq, contacts, blog.
+index, boxes, security, how-it-works, services, about, faq, contacts, news
+(the `blog` key), agents.
 
 ## SEO built in
 Unique title/description/keywords per page per language, canonical + hreflang
@@ -191,10 +239,20 @@ Structural consequences of that deck:
   confidentiality → SDF membership + partners → location → FAQ → CTA.
 - New blocks: confidentiality (home), additional-services fee table (boxes),
   The Deal Box step-by-step (services), vault photo pair (about).
-- Unregistered clients are no longer described as paying "double the rate";
-  the deck says they rent at an individual rate.
+- Unregistered clients were described as renting "at an individual rate",
+  per the deck. Since October 2026 the site publishes their price list
+  instead (see the October review).
 
 ## Still TODO before launch
+- **Rules of use PDFs.** `RULES` links to the three PDFs on the old
+  WordPress site. Copy them into `assets/` before the domain moves to this
+  site, or the footer links break.
+- **Social links from Anton.** `SOCIAL` has Facebook and X from the old
+  site; Instagram, Telegram, LinkedIn and YouTube are empty slots. Telegram
+  also joins the contact-button menu once filled. Confirm X is still used.
+- **Hero eyebrow.** The first version of the October notes asked to remove
+  "Первое частное сейфовое хранилище в Балтии"; the second version dropped
+  that line, so it stays for now. Confirm.
 - **SDF certificate scan.** Put it in `assets/img/` and set
   `MEMBERSHIP["certificate"]`.
 - **Bank details** for the requisites block (`REQUISITES`, empty rows).

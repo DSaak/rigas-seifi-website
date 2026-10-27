@@ -30,6 +30,18 @@ def mb(t):
     return out
 
 
+def money(v, lang, cents=True):
+    """27.5 -> "27,50" (LV/RU) or "27.50" (EN). cents=False drops a ",00"."""
+    s = f"{v:.2f}"
+    if not cents and s.endswith(".00"):
+        s = s[:-3]
+    return s if lang == "en" else s.replace(".", ",")
+
+def eur(v, lang):
+    """Price with the euro sign where each language puts it: €27.50 / 27,50 €."""
+    return f"€{money(v, lang, cents=False)}" if lang == "en" else f"{money(v, lang, cents=False)} €"
+
+
 # ---------- URL helpers (relative links between generated files) ----------
 def page_file(page):
     return f"{C.SLUGS[page]}.html"
@@ -77,6 +89,16 @@ ICONS = {
     "phone": '<path d="M5 4h3.5l1.5 4-2 1.5a12 12 0 0 0 6.5 6.5L16 14l4 1.5V19a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
     "mail": '<rect x="3" y="5" width="18" height="14" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m3.5 6 8.5 7 8.5-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
     "play": '<path d="M9 6.5v11l9-5.5z" fill="currentColor"/>',
+    "award": '<circle cx="12" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m8.6 13.4-1.6 7.6 5-2.6 5 2.6-1.6-7.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+    "globe": '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18M12 3c2.6 2.7 3.8 5.7 3.8 9s-1.2 6.3-3.8 9c-2.6-2.7-3.8-5.7-3.8-9S9.4 5.7 12 3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+    # social networks, simplified to the same line weight as the set above
+    "facebook": '<path d="M14.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4a20 20 0 0 0-2.3-.1c-2.3 0-3.9 1.4-3.9 4v2.2H8.8v3h2.6V21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+    "x": '<path d="M4.5 4h4.2l10.8 16h-4.2zM19 4l-5.9 6.8M5 20l6-6.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+    "instagram": '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3.8" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor"/>',
+    "telegram": '<path d="M21 4 3 11.2l6 2.2M21 4l-3 16-8.9-6.6M21 4 9.1 13.4V19l3-3.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+    "linkedin": '<rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 10.5V16M8 7.6v.1M11.5 16v-5.5M11.5 13c0-1.6 1-2.6 2.3-2.6s2.2.9 2.2 2.6V16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    "youtube": '<rect x="2.5" y="5.5" width="19" height="13" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m10 9.2 5 2.8-5 2.8z" fill="currentColor"/>',
+    "whatsapp": '<path d="M4.2 19.8 5.3 16A8.5 8.5 0 1 1 8.4 19l-4.2.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.2 8.4c.3-.5.6-.5.9-.5l.6.9.6 1.4-.7.9c.6 1.2 1.6 2.1 2.8 2.7l.9-.8 1.4.6.9.6c0 .4-.2.9-.6 1.2-.6.4-1.5.5-2.5.1a8 8 0 0 1-4.3-4.3c-.4-1-.4-1.9 0-2.8z" fill="currentColor"/>',
 }
 def icon(name):
     return f'<svg viewBox="0 0 24 24" aria-hidden="true">{ICONS.get(name, ICONS["box"])}</svg>'
@@ -143,28 +165,44 @@ def arrival_strip(lang, alt=False):
             f'<div class="photo-strip">{tiles}</div></div></section>')
 
 
-# ---------- isometric safe illustration (per box size) ----------
-def safe_svg(h):
-    """Simple isometric line-art box; h = box height in viewBox px."""
-    import math
-    ox, oy = 80, 104           # front-bottom corner
-    ux, uy = 52, -26           # iso axis to the right-back
-    vx, vy = -34, -17          # iso axis to the left-back
-    F = (ox, oy)
-    R = (ox + ux, oy + uy)
-    L = (ox + vx, oy + vy)
-    B = (ox + ux + vx, oy + uy + vy)
-    def up(p): return (p[0], p[1] - h)
-    def pts(*ps): return " ".join(f"{x},{y}" for x, y in ps)
-    Ft, Rt, Lt, Bt = up(F), up(R), up(L), up(B)
-    # keyhole detail on the right face, scaled to the face height
-    kx, ky = ox + ux * 0.5, oy + uy * 0.5 - h * 0.5
-    kr = min(3.2, h * 0.24)
-    return f'''<svg viewBox="0 0 160 116" aria-hidden="true">
-<polygon points="{pts(F, L, Lt, Ft)}" fill="#fafaf8" stroke="#1b3a6b" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="{pts(F, R, Rt, Ft)}" fill="#f0ede6" stroke="#1b3a6b" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="{pts(Ft, Rt, Bt, Lt)}" fill="#f5e6c8" stroke="#1b3a6b" stroke-width="1.5" stroke-linejoin="round"/>
-<circle cx="{kx:.0f}" cy="{ky:.1f}" r="{kr:.1f}" fill="none" stroke="#b8972a" stroke-width="1.5"/>
+# ---------- box drawing (per box size) ----------
+def box_svg(b):
+    """The box as it looks in the vault (frames 122 and 126 of the 2026
+    shoot): a dark box with a lid, a brass strip along the lid's edge and a
+    pull handle on the short front face. Drawn to one scale for all five
+    sizes on a shared baseline, so the cards compare at a glance, with the
+    height, width and length written on the drawing (October 2026 review).
+    Oblique projection, depth at 30° and half scale."""
+    k = 0.36                                   # px per mm
+    W, H = b["w"] * k, b["h"] * k
+    dx, dy = b["d"] * k * 0.5 * 0.866, b["d"] * k * 0.5 * 0.5
+    x0, y0 = 74, 152                           # front-bottom-left corner, room for "290 mm" to its left
+    def P(*ps): return " ".join(f"{x:.1f},{y:.1f}" for x, y in ps)
+    front = P((x0, y0), (x0 + W, y0), (x0 + W, y0 - H), (x0, y0 - H))
+    side = P((x0 + W, y0), (x0 + W + dx, y0 - dy), (x0 + W + dx, y0 - dy - H), (x0 + W, y0 - H))
+    top = P((x0, y0 - H), (x0 + W, y0 - H), (x0 + W + dx, y0 - dy - H), (x0 + dx, y0 - dy - H))
+    lid = max(3.0, min(6.5, H * 0.3))          # how far the lid comes down the sides
+    f = 0.42                                   # the lid's fold, measured back from the front
+    hh, hw = max(2.4, min(6.0, H * 0.2)), W * 0.36
+    hy = y0 - (H - lid) / 2 - hh / 2
+    # dimension lines: height left of the front, width under it, length along the side
+    nx, ny = 0.5, 0.866                        # unit normal pointing down-right of the side edge
+    sx, sy = x0 + W + nx * 9, y0 + ny * 9
+    mx, my = sx + dx / 2, sy - dy / 2
+    label = f'{b["h"]} × {b["w"]} × {b["d"]} mm'
+    return f'''<svg class="box-svg" viewBox="0 0 262 184" role="img" aria-label="{label}">
+<polygon class="bx-face" points="{side}"/>
+<polygon class="bx-face" points="{front}"/><polygon class="bx-shade" points="{front}" fill-opacity=".07"/>
+<polygon class="bx-face" points="{top}"/><polygon class="bx-shade" points="{top}" fill-opacity=".16"/>
+<line class="bx-line" x1="{x0 + dx * f:.1f}" y1="{y0 - H - dy * f:.1f}" x2="{x0 + W + dx * f:.1f}" y2="{y0 - H - dy * f:.1f}"/>
+<polyline class="bx-trim" points="{P((x0, y0 - H + lid), (x0 + W, y0 - H + lid), (x0 + W + dx, y0 - dy - H + lid))}"/>
+<rect class="bx-handle" x="{x0 + W / 2 - hw / 2:.1f}" y="{hy:.1f}" width="{hw:.1f}" height="{hh:.1f}" rx="{hh / 2:.1f}"/>
+<path class="bx-dim" d="M{x0 - 9} {y0}V{y0 - H:.1f}M{x0 - 12} {y0}h6M{x0 - 12} {y0 - H:.1f}h6"/>
+<text class="bx-dim-t" x="{x0 - 15}" y="{y0 - H / 2 + 5:.1f}" text-anchor="end">{b["h"]} mm</text>
+<path class="bx-dim" d="M{x0} {y0 + 9}H{x0 + W:.1f}M{x0} {y0 + 6}v6M{x0 + W:.1f} {y0 + 6}v6"/>
+<text class="bx-dim-t" x="{x0 + W / 2:.1f}" y="{y0 + 27}" text-anchor="middle">{b["w"]} mm</text>
+<path class="bx-dim" d="M{sx:.1f} {sy:.1f}L{sx + dx:.1f} {sy - dy:.1f}M{sx - nx * 3:.1f} {sy - ny * 3:.1f}l{nx * 6:.1f} {ny * 6:.1f}M{sx + dx - nx * 3:.1f} {sy - dy - ny * 3:.1f}l{nx * 6:.1f} {ny * 6:.1f}"/>
+<text class="bx-dim-t" x="{mx + 7:.1f}" y="{my + 16:.1f}">{b["d"]} mm</text>
 </svg>'''
 
 WA_SVG = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .2-3.2-.7-2.7-1.1-4.4-3.8-4.6-4-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9.9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.4l.9 2.1c.1.2.1.4 0 .6l-.4.6-.5.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.2 1.4 2.5 1.5.3.1.5.1.7-.1l1-1.2c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.4.1 0 .1.6-.1 1.3Z"/></svg>'
@@ -220,7 +258,7 @@ def head(lang, page):
 <meta name="theme-color" content="#0f2044">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{asset("styles.css")}">
 {schema_blocks(lang, page)}
 </head>
@@ -243,9 +281,9 @@ def schema_blocks(lang, page):
         "openingHoursSpecification": {"@type": "OpeningHoursSpecification",
             "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
             "opens": "10:00", "closes": "19:00"},
-        "priceRange": "€30–€150 / month",
+        "priceRange": "€27.50–€500 / month",
         "foundingDate": "2017",
-        "sameAs": [S["facebook"]],
+        "sameAs": [s["url"] for s in C.SOCIAL if s["url"]],
     }
     req = getattr(C, "REQUISITES", {"rows": []})
     legal_name = next((v for lbl, v in req["rows"] if lbl["en"] == "Company name" and v), None)
@@ -267,8 +305,8 @@ def schema_blocks(lang, page):
         items = []
         for i, b in enumerate(C.BOX_DATA, 1):
             items.append({"@type": "Product", "name": f"{S['brand']} — {C.UI[lang]['f_size']} Nr. {b['nr']}",
-                          "description": C.FITS[lang][b["nr"]],
-                          "offers": {"@type": "Offer", "price": b["m12"].replace("€", "").replace(",", "."),
+                          "description": f"{b['h']} × {b['w']} × {b['d']} mm",
+                          "offers": {"@type": "Offer", "price": f"{min(b['reg']):.2f}",
                                      "priceCurrency": "EUR", "availability": "https://schema.org/InStock"}})
         ilist = {"@context": "https://schema.org", "@type": "ItemList",
                  "itemListElement": [{"@type": "ListItem", "position": i, "item": it} for i, it in enumerate(items, 1)]}
@@ -302,6 +340,15 @@ def promo_bar(lang):
             f'<a href="{esc(link)}">{esc(text)}</a>'
             f'<button class="promo-close" id="promoClose" aria-label="Close">&times;</button></div>')
 
+def logo():
+    """Crossed keys plus the name, with SAFETY DEPOSIT BOXES under it as on
+    the old site's logo (October 2026 review). The tagline is English in
+    every language, as it was there."""
+    return (f'<a class="logo" href="{link("index")}" aria-label="{esc(S["brand"])}">{LOGO_SVG}'
+            f'<span class="logo-words"><span class="logo-text">RĪGAS&nbsp;SEIFI</span>'
+            f'<span class="logo-tag">SAFETY DEPOSIT BOXES</span></span></a>')
+
+
 def header(lang, current):
     u = C.UI[lang]
     nav_links = "".join(
@@ -312,16 +359,17 @@ def header(lang, current):
         f'<a href="{link_lang(l, current)}" hreflang="{l}"{_active(l == lang)}>{l.upper()}</a>'
         for l in C.LANGS
     )
+    # No phone number in the header since the October 2026 review. Phones
+    # and the hamburger widths keep the tap-to-call handset.
     return f"""{promo_bar(lang)}<header class="site-header" id="top">
   <div class="container header-inner">
-    <a class="logo" href="{link('index')}" aria-label="{esc(S['brand'])}">{LOGO_SVG}<span class="logo-text">RĪGAS&nbsp;SEIFI</span></a>
+    {logo()}
     <button class="nav-toggle" id="navToggle" aria-label="{esc(u['menu'])}" aria-expanded="false" aria-controls="mobileNav">
       <span></span><span></span><span></span>
     </button>
     <nav class="header-nav" aria-label="Main">{nav_links}</nav>
     <div class="header-actions">
       <a class="phone-icon" href="tel:{S['phone1_href']}" aria-label="{esc(S['phone1'])}"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M5 4h3.5l1.5 4-2 1.5a12 12 0 0 0 6.5 6.5L16 14l4 1.5V19a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg></a>
-      <a class="header-phone" href="tel:{S['phone1_href']}">{esc(S['phone1'])}</a>
       <div class="lang-switch" role="group" aria-label="Language">{langs}</div>
       <a class="btn btn-gold btn-sm" href="#book">{esc(u['book'])}</a>
     </div>
@@ -337,25 +385,76 @@ def header(lang, current):
 """
 
 
+def social_links(cls="social-links"):
+    """Icon links to every network in SOCIAL that has a url."""
+    items = "".join(
+        f'<a href="{esc(s["url"])}" target="_blank" rel="noopener" aria-label="{esc(s["name"])}" title="{esc(s["name"])}">{icon(s["key"])}</a>'
+        for s in C.SOCIAL if s["url"])
+    return f'<div class="{cls}">{items}</div>' if items else ""
+
+
+def social_url(key):
+    return next((s["url"] for s in C.SOCIAL if s["key"] == key and s["url"]), "")
+
+
+def contact_fab(lang):
+    """The green handset, bottom right (October 2026 review). It opens a
+    small menu of ways to get in touch. Telegram appears once its link is in
+    SOCIAL."""
+    u = C.UI[lang]
+    def item(href, ic, text, track="", ext=True):
+        t = f' data-track="{track}"' if track else ""
+        x = ' target="_blank" rel="noopener"' if ext else ""
+        return f'<a href="{esc(href)}"{x}{t}>{icon(ic)}<span>{esc(text)}</span></a>'
+    rows = item(wa_href(lang), "whatsapp", "WhatsApp", "whatsapp_click")
+    rows += item(f"tel:{S['phone1_href']}", "phone", f"{u['fab_call']} {S['phone1']}", ext=False)
+    rows += item(f"tel:{S['phone2_href']}", "phone", f"{u['fab_call']} {S['phone2']}", ext=False)
+    if social_url("telegram"):
+        rows += item(social_url("telegram"), "telegram", "Telegram", "telegram_click")
+    if social_url("facebook"):
+        rows += item(social_url("facebook"), "facebook", "Facebook", "facebook_click")
+    rows += item(f"mailto:{S['email']}", "mail", S["email"], ext=False)
+    return f"""<div class="contact-fab" id="contactFab">
+  <div class="contact-menu" id="contactMenu" hidden>
+    <p class="contact-menu-title">{esc(u['fab_title'])}</p>
+    {rows}
+  </div>
+  <button type="button" class="contact-fab-btn" id="contactFabBtn" aria-expanded="false" aria-controls="contactMenu" aria-label="{esc(u['fab_label'])}">{icon("phone")}</button>
+</div>"""
+
+
+def footer_info_link(lang, key):
+    u = C.UI[lang]
+    if key == "rules":
+        return f'<li><a href="{esc(C.RULES[lang])}" target="_blank" rel="noopener">{esc(u["nav"]["rules"])}</a></li>'
+    return f'<li><a href="{link(key)}">{esc(u["nav"][key])}</a></li>'
+
+
 def footer(lang):
     u = C.UI[lang]
     nav = "".join(f'<li><a href="{link(p)}">{esc(u["nav"][p])}</a></li>' for p in C.NAV)
+    info = "".join(footer_info_link(lang, k) for k in C.FOOTER_INFO)
     year = datetime.date.today().year
     return f"""</main>
 <footer class="site-footer">
   <div class="container footer-grid">
     <div class="footer-brand">
-      <a class="logo" href="{link('index')}" aria-label="{esc(S['brand'])}">{LOGO_SVG}<span class="logo-text">RĪGAS&nbsp;SEIFI</span></a>
+      {logo()}
       <p>{esc(u['footer_tagline'])}</p>
+      {social_links()}
     </div>
     <div class="footer-col">
       <h4>{esc(u['footer_nav'])}</h4><ul>{nav}</ul>
+    </div>
+    <div class="footer-col">
+      <h4>{esc(u['footer_info'])}</h4><ul>{info}</ul>
     </div>
     <div class="footer-col">
       <h4>{esc(u['footer_contact'])}</h4>
       <ul>
         <li>{esc(S['address'])}</li>
         <li><a href="tel:{S['phone1_href']}">{esc(S['phone1'])}</a></li>
+        <li><a href="tel:{S['phone2_href']}">{esc(S['phone2'])}</a></li>
         <li><a href="mailto:{S['email']}">{esc(S['email'])}</a></li>
       </ul>
     </div>
@@ -369,7 +468,7 @@ def footer(lang):
     <nav aria-label="Legal"><a href="#">{esc(u['ft_privacy'])}</a><a href="#">{esc(u['ft_cookies'])}</a></nav>
   </div>
 </footer>
-<a class="wa-fab" href="{esc(wa_href(lang))}" target="_blank" rel="noopener" aria-label="WhatsApp" data-track="whatsapp_click">{WA_SVG}</a>
+{contact_fab(lang)}
 <div class="cookie-banner" id="cookieBanner" hidden>
   <p>{esc(u['cookie_text'])}</p>
   <div class="cookie-actions">
@@ -407,18 +506,16 @@ def steps(lang, alt=False, heading=True):
 
 def size_cards(lang, heading=True):
     u = C.UI[lang]
-    # isometric box height per size (moodboard note 7: show scale visually)
-    heights = {"1": 8, "2": 13, "3": 24, "4": 36, "5": 58}
     cards = []
     for b in C.BOX_DATA:
         pop = b.get("popular")
         badge = f'<span class="pop-badge">{esc(u["popular"])}</span>' if pop else ""
         btn = "btn-gold" if pop else "btn-outline"
+        # "from" = the lowest monthly rate, which is the 24-month one (October 2026 review)
         cards.append(f"""<article class="size-card{' popular' if pop else ''} reveal" style="--i:{len(cards)}">{badge}
-  <div class="size-visual">{safe_svg(heights[b['nr']])}</div>
-  <h3>Nr. {b['nr']}</h3><p class="dims">{esc(b['dim'])}</p>
-  <p class="fits">{esc(C.FITS[lang][b['nr']])}</p>
-  <p class="price">{esc(u['from'])} <strong>{esc(b['m12'])}</strong>{esc(u['permonth'])}</p>
+  <div class="size-visual">{box_svg(b)}</div>
+  <h3>Nr. {b['nr']}</h3>
+  <p class="price">{esc(u['from'])} <strong>{esc(eur(min(b['reg']), lang))}</strong>{esc(u['permonth'])}</p>
   <a class="btn {btn} btn-sm" href="#book" data-size="Nr.{b['nr']}">{esc(u['cta_book'])}</a></article>""")
     head_html = (f'<h2 class="center">{esc(C.H[lang]["sizes"])}</h2>'
                  f'<p class="section-sub center">{esc(C.H[lang]["sizes_sub"])}</p>') if heading else ""
@@ -427,15 +524,45 @@ def size_cards(lang, heading=True):
   <div class="size-grid">{''.join(cards)}</div>
   <p class="price-note">{esc(C.H[lang]['price_note'])}</p></div></section>"""
 
-def size_table(lang):
+def price_table(lang, kind):
+    """One price list ("reg" or "unreg"), headed like the owners' 2025 price
+    list. Each term column carries the monthly rate. Width and length are the
+    same for every box, so on phones those two columns drop out (a note says
+    so) and the table fits the screen; the size header has a wide and a
+    narrow copy for that, since a colspan cannot change with the screen."""
     h = C.H[lang]
+    terms = C.TERMS[kind]
+    def two(long, short):
+        return f'<span class="lg">{esc(long)}</span><span class="sm">{esc(short)}</span>'
+    head = (f'<tr><th rowspan="2" class="c-nr">{two(h["table_nr"], "Nr.")}</th>'
+            f'<th colspan="3" class="lg-cell">{esc(h["table_size"])}</th>'
+            f'<th class="sm-cell">{esc(h["table_size"])}</th>'
+            f'<th colspan="{len(terms)}" class="c-term">{esc(h["table_term"])}</th></tr>'
+            f'<tr><th>{two(h["table_h"], h["table_h_short"])}</th><th class="wl">{esc(h["table_w"])}</th><th class="wl">{esc(h["table_l"])}</th>'
+            + "".join(f'<th class="num">{two(*h["terms"][t])}</th>' for t in terms) + "</tr>")
     rows = "".join(
-        f"<tr><td><strong>Nr. {b['nr']}</strong></td><td>{esc(b['dim'])}</td><td>{esc(C.FITS[lang][b['nr']])}</td><td>{esc(b['m1'])}</td><td><strong>{esc(b['m12'])}</strong></td><td>{esc(b['m24'])}</td></tr>"
+        f'<tr><td class="c-nr">{b["nr"]}</td><td>{b["h"]}</td><td class="wl">{b["w"]}</td><td class="wl">{b["d"]}</td>'
+        + "".join(f'<td class="num">{money(v, lang)}</td>' for v in b[kind]) + "</tr>"
         for b in C.BOX_DATA)
-    return f"""<section class="section"><div class="container">
-  <div class="table-wrap"><table class="price-table">
-    <thead><tr><th>{esc(h['table_size'])}</th><th>{esc(h['table_dim'])}</th><th>{esc(h['table_fits'])}</th><th>{esc(h['table_m1'])}</th><th>{esc(h['table_m12'])}</th><th>{esc(h['table_m24'])}</th></tr></thead>
-    <tbody>{rows}</tbody></table></div>
+    return f'<table class="price-table box-prices"><thead>{head}</thead><tbody>{rows}</tbody></table>'
+
+
+def size_table(lang):
+    """Registered and unregistered price lists behind two tabs, as on the
+    old site (October 2026 review). Without JS both tables stay visible."""
+    h = C.H[lang]
+    tabs = "".join(
+        f'<button type="button" role="tab" id="tab-{k}" aria-controls="prices-{k}" '
+        f'aria-selected="{"true" if i == 0 else "false"}"{"" if i == 0 else " tabindex=\"-1\""}>{esc(h["tab_" + k])}</button>'
+        for i, k in enumerate(("reg", "unreg")))
+    panels = "".join(
+        f'<div class="table-wrap price-panel" role="tabpanel" id="prices-{k}" aria-labelledby="tab-{k}">'
+        f'<h3 class="price-panel-title">{esc(h["tab_" + k])}</h3>{price_table(lang, k)}</div>'
+        for k in ("reg", "unreg"))
+    return f"""<section class="section" id="prices"><div class="container">
+  <div class="price-tabs" role="tablist" hidden>{tabs}</div>
+  {panels}
+  <p class="price-note sm-only">{esc(h['table_wl_note'])}</p>
   <p class="price-note">{esc(h['price_note'])}</p></div></section>"""
 
 def security_block(lang, full=False, alt=False):
@@ -462,12 +589,12 @@ def security_block(lang, full=False, alt=False):
 
 def trust_block(lang, alt=False):
     # "why clients choose us": intro + icon cards (no reviews — there are none)
+    # seven equal cards, heading in capitals over the text (October 2026 review)
     t = C.TRUST[lang]
     cards = "".join(
-        f'<article class="trust-fact reveal{" feature" if i == 0 else ""}" style="--i:{i}">'
-        f'<span class="card-num" aria-hidden="true">{i + 1:02d}</span>'
+        f'<article class="trust-fact reveal" style="--i:{i}">'
         f'<div class="adv-icon">{icon(ic)}</div>'
-        f'<strong>{esc(title)}</strong><p>{esc(body)}</p></article>'
+        f'<h3 class="trust-title">{esc(title)}</h3><p>{esc(body)}</p></article>'
         for i, (ic, title, body) in enumerate(t["cards"]))
     return f"""<section class="trust section{' section-alt' if alt else ''}"><div class="container"><h2 class="center">{esc(C.H[lang]['trust'])}</h2>
   <p class="section-sub center">{esc(t['intro'])}</p>
@@ -483,7 +610,7 @@ def privacy_block(lang, alt=False):
 
 def extras_table(lang, alt=True):
     h = C.H[lang]
-    rows = "".join(f"<tr><td>{esc(t)}</td><td class=\"num\"><strong>{esc(v)}</strong></td></tr>"
+    rows = "".join(f"<tr><td>{esc(t)}</td><td class=\"num\">{esc(v)}</td></tr>"
                    for t, v in C.EXTRAS[lang])
     return f"""<section class="section{' section-alt' if alt else ''}"><div class="container">
   <h2 class="center">{esc(h['extras'])}</h2>
@@ -640,6 +767,7 @@ def hero(lang):
     u = C.UI[lang]
     stats = "".join(f'<li style="--i:{i}"><strong data-count>{esc(v)}</strong><span>{esc(l)}</span></li>'
                     for i, (v, l) in enumerate(he["stats"]))
+    note = f'<p class="stat-note">{esc(he["stats_note"])}</p>' if he.get("stats_note") else ""
     return f"""<section class="hero">
   <div class="container hero-grid">
     <div class="hero-inner">
@@ -650,7 +778,7 @@ def hero(lang):
     </div>
     <div class="hero-media anim" style="--d:2" data-parallax="0.05">{media_placeholder(lang, 'hero', slot='hero')}</div>
   </div></section>
-<div class="stat-band"><div class="container"><ul>{stats}</ul></div></div>"""
+<div class="stat-band"><div class="container"><ul>{stats}</ul>{note}</div></div>"""
 
 def body_index(lang):
     # order follows the 2025 copy deck: why us -> prices -> security -> how -> privacy,
@@ -684,12 +812,15 @@ def body_how(lang):
 
 def body_services(lang):
     u = C.UI[lang]
-    more = (f'<a class="btn btn-outline btn-sm service-more" target="_blank" rel="noopener" '
-            f'href="{esc(wa_href(lang))}" data-track="whatsapp_click">{esc(u["cta_more"])}</a>')
+    wa_more = (f'<a class="btn btn-outline btn-sm service-more" target="_blank" rel="noopener" '
+               f'href="{esc(wa_href(lang))}" data-track="whatsapp_click">{esc(u["cta_more"])}</a>')
+    # The Deal Box card leads to its own step-by-step description further down
+    # the page, the others still open WhatsApp (October 2026 review).
+    deal_more = f'<a class="btn btn-outline btn-sm service-more" href="#deal-box">{esc(u["cta_more"])}</a>'
     cards = "".join(
         f'<article class="service-card reveal" style="--i:{i}">'
-        f'<span class="card-num" aria-hidden="true">{i + 1:02d}</span>'
-        f'<div class="adv-icon">{icon(ic)}</div><h3>{esc(t)}</h3><p>{esc(b)}</p>{more}</article>'
+        f'<div class="adv-icon">{icon(ic)}</div><h3>{esc(t)}</h3><p>{esc(b)}</p>'
+        f'{deal_more if ic == "deal" else wa_more}</article>'
         for i, (ic, t, b) in enumerate(C.SERVICES[lang]))
     sub = {'lv':'Vairāk nekā seifu noma.','ru':'Больше, чем аренда сейфа.','en':'More than safe deposit rental.'}[lang]
     grid = f'<section class="section"><div class="container"><div class="service-grid">{cards}</div></div></section>'
@@ -733,6 +864,12 @@ def contact_details(lang):
                f'<a href="tel:{S["phone2_href"]}" data-track="phone_click">{esc(S["phone2"])}</a>',
                f'<a class="contact-link" target="_blank" rel="noopener" href="{esc(wa_href(lang))}" data-track="whatsapp_click">{esc(u["cta_wa"])} <span aria-hidden="true">→</span></a>')
         + card(3, "mail", u["lbl_email"], f'<a href="mailto:{S["email"]}">{esc(S["email"])}</a>'))
+    # every social network with a link (October 2026 review)
+    nets = "".join(f'<a href="{esc(s["url"])}" target="_blank" rel="noopener">{icon(s["key"])}<span>{esc(s["name"])}</span></a>'
+                   for s in C.SOCIAL if s["url"])
+    if nets:
+        cards += (f'<div class="contact-card contact-social reveal" style="--i:4">'
+                  f'<span class="label">{esc(u["lbl_social"])}</span><div class="social-list">{nets}</div></div>')
     return (f'<section class="contact section" id="location"><div class="container contact-inner">'
             f'<div class="contact-cards">{cards}</div>'
             f'<div class="location-map contact-map reveal"><iframe title="Map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" '
@@ -768,8 +905,26 @@ def body_blog(lang):
     grid = f'<section class="section"><div class="container"><div class="blog-grid">{cards}</div></div></section>'
     return breadcrumb(lang, "blog") + page_hero(lang, C.UI[lang]["nav"].get("blog", "Blog"), sub) + grid + book_section(lang)
 
+def body_agents(lang):
+    """The partnership programme, carried over from the old site's
+    "Aģentiem" page and linked from the footer (October 2026 review)."""
+    a = C.AGENTS[lang]
+    lbl = C.DEALBOX_STEP[lang]
+    rows = "".join(f'<li class="reveal" style="--i:{i}"><span class="deal-num">{esc(lbl)} {i+1}</span><p>{esc(t)}</p></li>'
+                   for i, t in enumerate(a["steps"]))
+    body = f"""<section class="section"><div class="container narrow">
+  <p>{esc(a['intro'])}</p>
+  <h2 class="center agents-h">{esc(a['steps_t'])}</h2>
+  <ol class="deal-steps">{rows}</ol>
+  <div class="deal-note"><strong>{esc(a['more_t'])}</strong> {esc(a['more'])}</div>
+  <p class="center agents-cta"><a class="btn btn-navy" href="{link('contacts')}">{esc(C.UI[lang]['cta_contact'])}</a></p>
+</div></section>"""
+    return (breadcrumb(lang, "agents") + page_hero(lang, C.UI[lang]["nav"]["agents"], a["sub"])
+            + body + book_section(lang))
+
 BODY = {"index": body_index, "boxes": body_boxes, "security": body_security, "how": body_how,
-        "services": body_services, "about": body_about, "faq": body_faq, "contacts": body_contacts, "blog": body_blog}
+        "services": body_services, "about": body_about, "faq": body_faq, "contacts": body_contacts,
+        "blog": body_blog, "agents": body_agents}
 
 
 # =====================================================================

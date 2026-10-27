@@ -20,9 +20,9 @@ DEFAULT_LANG = "lv"
 PROMO = {
     "active": True,
     "link": "#book",   # where clicking the bar takes the visitor
-    "lv": "🔑 Atvēršanas akcija — pirmais mēnesis −50 %. Vietu skaits ierobežots.",
-    "ru": "🔑 Акция к открытию — первый месяц −50 %. Количество мест ограничено.",
-    "en": "🔑 Opening offer — first month −50 %. Limited number of boxes.",
+    "lv": "Atvēršanas akcija — pirmais mēnesis −50 %. Vietu skaits ierobežots.",
+    "ru": "Акция к открытию — первый месяц −50 %. Количество мест ограничено.",
+    "en": "Opening offer — first month −50 %. Limited number of boxes.",
 }
 
 SITE = {
@@ -43,7 +43,7 @@ SITE = {
 }
 
 # page key -> shared slug (language lives in the path prefix: /lv/, /ru/, /en/)
-PAGES = ["index", "boxes", "security", "how", "services", "about", "faq", "contacts", "blog"]
+PAGES = ["index", "boxes", "security", "how", "services", "about", "faq", "contacts", "blog", "agents"]
 SLUGS = {
     "index": "index",
     "boxes": "boxes",
@@ -53,18 +53,47 @@ SLUGS = {
     "about": "about",
     "faq": "faq",
     "contacts": "contacts",
-    "blog": "blog",
+    "blog": "news",       # shown as "News" since the October 2026 review
+    "agents": "agents",
 }
-# pages shown in the header nav (in order)
-NAV = ["boxes", "security", "services", "about", "faq", "contacts"]
+# pages shown in the header nav (in order). The October 2026 review moved the
+# rules of use, the agents page and the FAQ down into the footer (FOOTER_INFO).
+NAV = ["boxes", "security", "services", "about", "blog", "contacts"]
+FOOTER_INFO = ["rules", "agents", "faq"]   # "rules" is the PDF in RULES, the rest are pages
 
-# ----- prices: 12-month registered-client monthly rate (from current price list) -----
+# The rental rules, as published on the old site (checked 27 October 2026).
+# Copy the three PDFs into assets/ before rigasseifi.lv moves to the new site,
+# or these links will break with the old WordPress install.
+RULES = {
+    "lv": "https://rigasseifi.lv/wp-content/uploads/ires_noteikumi_lv.pdf",
+    "ru": "https://rigasseifi.lv/wp-content/uploads/ires_noteikumi_ru.pdf",
+    "en": "https://rigasseifi.lv/wp-content/uploads/ires_noteikumi_en.pdf",
+}
+
+# Social networks: contacts page, footer, and (Facebook, Telegram) the contact
+# button. Rows with an empty url are skipped. Facebook and X are the links on
+# the old site; the rest are with Anton and still to be filled in.
+SOCIAL = [
+    {"key": "facebook",  "name": "Facebook",  "url": "https://www.facebook.com/RigasSeifiLatvija"},
+    {"key": "x",         "name": "X",         "url": "https://twitter.com/rigasseifi"},
+    {"key": "instagram", "name": "Instagram", "url": ""},
+    {"key": "telegram",  "name": "Telegram",  "url": ""},
+    {"key": "linkedin",  "name": "LinkedIn",  "url": ""},
+    {"key": "youtube",   "name": "YouTube",   "url": ""},
+]
+
+# ----- prices: "Price list LV/RU/EN_Seifi4U_2025" (sent 11 October 2026) -----
+# Sizes in mm. "reg" = registered clients, monthly rate for a 1, 3, 6, 12 and
+# 24-month term. "unreg" = unregistered clients, 1, 3, 6 and 12 months (that
+# list has no 24-month column). A longer term is charged as the monthly rate
+# times the months.
+TERMS = {"reg": [1, 3, 6, 12, 24], "unreg": [1, 3, 6, 12]}
 BOX_DATA = [
-    {"nr": "1", "dim": "3,5 × 24,5 × 43,5 cm", "m1": "€50", "m12": "€30",    "m24": "€27,50",  "qty": "722"},
-    {"nr": "2", "dim": "6 × 24,5 × 43,5 cm",   "m1": "€60", "m12": "€37,50", "m24": "€32,50",  "qty": "531"},
-    {"nr": "3", "dim": "11 × 24,5 × 43,5 cm",  "m1": "€70", "m12": "€42,50", "m24": "€37,50",  "qty": "1795", "popular": True},
-    {"nr": "4", "dim": "16 × 24,5 × 43,5 cm",  "m1": "€150","m12": "€90",    "m24": "€82,50",  "qty": "142"},
-    {"nr": "5", "dim": "29 × 24,5 × 43,5 cm",  "m1": "€250","m12": "€150",   "m24": "€137,50", "qty": "71"},
+    {"nr": "1", "h": 35,  "w": 245, "d": 435, "reg": [50, 45, 40, 30, 27.5],       "unreg": [100, 90, 80, 60]},
+    {"nr": "2", "h": 60,  "w": 245, "d": 435, "reg": [60, 55, 50, 37.5, 32.5],     "unreg": [120, 110, 100, 75]},
+    {"nr": "3", "h": 110, "w": 245, "d": 435, "reg": [70, 65, 57.5, 42.5, 37.5],   "unreg": [140, 130, 115, 85], "popular": True},
+    {"nr": "4", "h": 160, "w": 245, "d": 435, "reg": [150, 135, 120, 90, 82.5],    "unreg": [300, 270, 240, 180]},
+    {"nr": "5", "h": 290, "w": 245, "d": 435, "reg": [250, 225, 200, 150, 137.5],  "unreg": [500, 450, 400, 300]},
 ]
 
 # =====================================================================
@@ -73,7 +102,8 @@ BOX_DATA = [
 UI = {
     "lv": {
         "nav": {"boxes": "Seifi un cenas", "security": "Drošība", "services": "Pakalpojumi",
-                "about": "Par mums", "faq": "FAQ", "contacts": "Kontakti"},
+                "about": "Par mums", "faq": "FAQ", "contacts": "Kontakti",
+                "blog": "Jaunumi", "agents": "Aģentiem", "rules": "Lietošanas noteikumi"},
         "book": "Rezervēt", "menu": "Izvēlne", "lang_name": "Latviešu",
         "cta_book": "Rezervēt seifu", "cta_prices": "Apskatīt cenas", "cta_call": "Zvanīt",
         "cta_route": "Maršruts", "cta_wa": "Rakstīt WhatsApp", "cta_more": "Uzzināt vairāk",
@@ -94,10 +124,14 @@ UI = {
         "f_ok_t": "Paldies!", "f_ok_p": "Jūsu pieteikums saņemts. Sazināsimies vienas darba dienas laikā.",
         "or_call": "vai zvaniet:",
         "lbl_address": "Adrese", "lbl_phone": "Tālrunis", "lbl_email": "E-pasts",
+        "footer_info": "Informācija", "lbl_social": "Sociālie tīkli",
+        "fab_label": "Sazināties", "fab_title": "Kā ar mums sazināties?", "fab_call": "Zvanīt",
+        "cta_contact": "Sazināties ar mums",
     },
     "ru": {
         "nav": {"boxes": "Ячейки и цены", "security": "Безопасность", "services": "Услуги",
-                "about": "О компании", "faq": "FAQ", "contacts": "Контакты"},
+                "about": "О компании", "faq": "FAQ", "contacts": "Контакты",
+                "blog": "Новости", "agents": "Агентам", "rules": "Правила пользования"},
         "book": "Забронировать", "menu": "Меню", "lang_name": "Русский",
         "cta_book": "Забронировать ячейку", "cta_prices": "Узнать цены", "cta_call": "Позвонить",
         "cta_route": "Маршрут", "cta_wa": "Написать в WhatsApp", "cta_more": "Узнать подробнее",
@@ -118,10 +152,14 @@ UI = {
         "f_ok_t": "Спасибо!", "f_ok_p": "Заявка получена. Свяжемся с вами в течение одного рабочего дня.",
         "or_call": "или звоните:",
         "lbl_address": "Адрес", "lbl_phone": "Телефон", "lbl_email": "Эл. почта",
+        "footer_info": "Информация", "lbl_social": "Социальные сети",
+        "fab_label": "Связаться", "fab_title": "Как с нами связаться?", "fab_call": "Позвонить",
+        "cta_contact": "Связаться с нами",
     },
     "en": {
         "nav": {"boxes": "Boxes & prices", "security": "Security", "services": "Services",
-                "about": "About", "faq": "FAQ", "contacts": "Contacts"},
+                "about": "About", "faq": "FAQ", "contacts": "Contacts",
+                "blog": "News", "agents": "For agents", "rules": "Rules of use"},
         "book": "Book now", "menu": "Menu", "lang_name": "English",
         "cta_book": "Book a box", "cta_prices": "See prices", "cta_call": "Call us",
         "cta_route": "Directions", "cta_wa": "Message on WhatsApp", "cta_more": "Learn more",
@@ -142,27 +180,20 @@ UI = {
         "f_ok_t": "Thank you!", "f_ok_p": "Your request has been received. We will contact you within one business day.",
         "or_call": "or call:",
         "lbl_address": "Address", "lbl_phone": "Phone", "lbl_email": "Email",
+        "footer_info": "Information", "lbl_social": "Social media",
+        "fab_label": "Contact us", "fab_title": "How would you like to reach us?", "fab_call": "Call",
+        "cta_contact": "Contact us",
     },
-}
-
-# box-size "what fits" descriptions, per language, keyed by box nr
-FITS = {
-    "lv": {"1": "Dokumenti, valūta, vērtspapīri", "2": "Dokumenti, rotaslietas, datu nesēji",
-           "3": "Rotaslietas, kolekcijas, mape A4", "4": "Lielāki priekšmeti, kastes", "5": "Kolekcijas, tehnika, arhīvi"},
-    "ru": {"1": "Документы, валюта, ценные бумаги", "2": "Документы, украшения, носители данных",
-           "3": "Украшения, коллекции, папка А4", "4": "Крупные предметы, шкатулки", "5": "Коллекции, техника, архивы"},
-    "en": {"1": "Documents, currency, securities", "2": "Documents, jewellery, data media",
-           "3": "Jewellery, collections, A4 folder", "4": "Larger items, cases", "5": "Collections, equipment, archives"},
 }
 
 # SEO meta: per language, per page -> (title, description, keywords)
 META = {
     "lv": {
-        "index": ("Rīgas Seifi — Privātas seifu glabātavas Rīgas centrā | No €30/mēn.",
-                  "Vairāk nekā 3000 seifu divās pazemes glabātavās Rīgas centrā. Bez bankas konta, pilnīga konfidencialitāte. No €30 mēnesī.",
+        "index": ("Rīgas Seifi — Privātas seifu glabātavas Rīgas centrā | No €27,50/mēn.",
+                  "Vairāk nekā 3000 seifu divās pazemes glabātavās Rīgas centrā. Bez bankas konta, pilnīga konfidencialitāte. No €27,50 mēnesī.",
                   "seifu noma, seifa īre, bankas instrument, sefs Rīgā, vērtslietu glabāšana"),
-        "boxes": ("Seifu izmēri un cenas — Rīgas Seifi | No €30 mēnesī",
-                  "Pieci seifu izmēri, atklātas cenas no €30/mēn. Izvēlieties izmēru un rezervējiet seifu Rīgas centrā tiešsaistē.",
+        "boxes": ("Seifu izmēri un cenas — Rīgas Seifi | No €27,50 mēnesī",
+                  "Pieci seifu izmēri, atklātas cenas no €27,50/mēn. Izvēlieties izmēru un rezervējiet seifu Rīgas centrā tiešsaistē.",
                   "seifa cena, seifu izmēri, seifa noma Rīgā, sefs cena"),
         "security": ("Drošība — Rīgas Seifi | Pazemes glabātavas, Rosengrens, 24/7 apsardze",
                      "Divas pazemes dzelzsbetona glabātavas, Rosengrens aprīkojums, bruņotas durvis, video novērošana un diennakts bruņota apsardze.",
@@ -182,16 +213,19 @@ META = {
         "contacts": ("Kontakti un adrese — Kaļķu iela 26, Vecrīga | Rīgas Seifi",
                      "Rīgas Seifi: Kaļķu iela 26, Vecrīga. Tālrunis, WhatsApp, e-pasts, karte un darba laiks. Rezervējiet seifu jau šodien.",
                      "Rīgas Seifi kontakti, seifu noma adrese, Kaļķu iela, Vecrīga"),
-        "blog": ("Blogs un padomi — vērtslietu glabāšana | Rīgas Seifi",
-                 "Padomi par vērtslietu un dokumentu drošu glabāšanu, seifu nomu un atšķirībām starp bankas un privāto glabātavu.",
-                 "vērtslietu glabāšana, ko glabāt seifā, bankas vs privātais seifs"),
+        "blog": ("Jaunumi — Rīgas Seifi",
+                 "Rīgas Seifi jaunumi un padomi par vērtslietu un dokumentu drošu glabāšanu.",
+                 "Rīgas Seifi jaunumi, vērtslietu glabāšana, ko glabāt seifā"),
+        "agents": ("Aģentiem — partneru programma | Rīgas Seifi",
+                   "Partneru programma aģentiem un profesionāļiem. Fiksēti procenti no piesaistīto klientu samaksātās seifu īres.",
+                   "partneru programma, aģentiem, seifu īre Rīgā"),
     },
     "ru": {
-        "index": ("Rīgas Seifi — Аренда сейфовых ячеек в центре Риги | От €30/мес.",
-                  "Более 3000 сейфов в двух подземных хранилищах в центре Риги. Без банковского счёта, полная конфиденциальность. От €30 в месяц.",
+        "index": ("Rīgas Seifi — Аренда сейфовых ячеек в центре Риги | От €27,50/мес.",
+                  "Более 3000 сейфов в двух подземных хранилищах в центре Риги. Без банковского счёта, полная конфиденциальность. От €27,50 в месяц.",
                   "аренда сейфа, сейфовая ячейка Рига, хранение ценностей, аренда сейфовой ячейки"),
-        "boxes": ("Размеры и цены сейфов — Rīgas Seifi | От €30 в месяц",
-                  "Пять размеров ячеек, открытые цены от €30/мес. Выберите размер и забронируйте сейф в центре Риги онлайн.",
+        "boxes": ("Размеры ячеек и цены — Rīgas Seifi | От €27,50 в месяц",
+                  "Пять размеров ячеек, открытые цены от €27,50/мес. Выберите размер и забронируйте сейф в центре Риги онлайн.",
                   "цена сейфа, размеры ячеек, аренда сейфа Рига, стоимость сейфовой ячейки"),
         "security": ("Безопасность — Rīgas Seifi | Подземные хранилища, Rosengrens, охрана 24/7",
                      "Два подземных железобетонных хранилища, оборудование Rosengrens, бронедвери, видеонаблюдение и круглосуточная вооружённая охрана.",
@@ -211,16 +245,19 @@ META = {
         "contacts": ("Контакты и адрес — Kaļķu iela 26, Старая Рига | Rīgas Seifi",
                      "Rīgas Seifi: Kaļķu iela 26, Старая Рига. Телефон, WhatsApp, эл. почта, карта и часы работы. Забронируйте сейф сегодня.",
                      "Rīgas Seifi контакты, аренда сейфа адрес, Kaļķu iela, Старая Рига"),
-        "blog": ("Блог и советы — хранение ценностей | Rīgas Seifi",
-                 "Советы о безопасном хранении ценностей и документов, аренде сейфа и отличиях частного хранилища от банковского.",
-                 "хранение ценностей, что хранить в сейфе, банк против частного сейфа"),
+        "blog": ("Новости — Rīgas Seifi",
+                 "Новости Rīgas Seifi и советы о безопасном хранении ценностей и документов.",
+                 "новости Rīgas Seifi, хранение ценностей, что хранить в сейфе"),
+        "agents": ("Агентам — партнёрская программа | Rīgas Seifi",
+                   "Партнёрская программа для агентов и профессионалов. Фиксированный процент от аренды ячеек, оплаченной привлечёнными клиентами.",
+                   "партнёрская программа, агентам, аренда сейфа Рига"),
     },
     "en": {
-        "index": ("Rīgas Seifi — Private Safe Deposit Boxes in Central Riga | From €30/mo",
-                  "Over 3,000 safe deposit boxes in two underground vaults in central Riga. No bank account, full confidentiality. From €30 a month.",
+        "index": ("Rīgas Seifi — Private Safe Deposit Boxes in Central Riga | From €27.50/mo",
+                  "Over 3,000 safe deposit boxes in two underground vaults in central Riga. No bank account, full confidentiality. From €27.50 a month.",
                   "safe deposit box riga, safe rental, valuables storage, private vault riga"),
-        "boxes": ("Box Sizes & Prices — Rīgas Seifi | From €30 a month",
-                  "Five box sizes, transparent prices from €30/mo. Choose a size and book your safe deposit box in central Riga online.",
+        "boxes": ("Box Sizes & Prices — Rīgas Seifi | From €27.50 a month",
+                  "Five box sizes, transparent prices from €27.50/mo. Choose a size and book your safe deposit box in central Riga online.",
                   "safe deposit box price, box sizes, safe rental riga, deposit box cost"),
         "security": ("Security — Rīgas Seifi | Underground vaults, Rosengrens, 24/7 guards",
                      "Two underground reinforced-concrete vaults, Rosengrens equipment, armoured doors, video surveillance and round-the-clock armed security.",
@@ -240,9 +277,12 @@ META = {
         "contacts": ("Contacts & Location — Kaļķu iela 26, Old Riga | Rīgas Seifi",
                      "Rīgas Seifi: Kaļķu iela 26, Old Riga. Phone, WhatsApp, email, map and opening hours. Book your safe deposit box today.",
                      "rigas seifi contacts, safe deposit address, kalku street, old riga"),
-        "blog": ("Blog & guides — storing valuables | Rīgas Seifi",
-                 "Guides on safely storing valuables and documents, renting a safe deposit box and how private vaults differ from banks.",
-                 "storing valuables, what to keep in a safe, bank vs private safe"),
+        "blog": ("News — Rīgas Seifi",
+                 "News from Rīgas Seifi, with guides on storing valuables and documents safely.",
+                 "rigas seifi news, storing valuables, what to keep in a safe"),
+        "agents": ("For agents — partnership programme | Rīgas Seifi",
+                   "A partnership programme for agents and professionals, paying a fixed percentage of the rental paid by the clients they bring.",
+                   "partnership programme, agents, safe deposit riga"),
     },
 }
 
@@ -330,55 +370,58 @@ SECLOCKS = {
 # Confidentiality block (home page)
 PRIVACY = {
     "lv": {"body": "Bez bankas konta atvēršanas. Seifa saturu zina tikai jūs — mēs to nepārbaudām un nereģistrējam. Pirmajā apmeklējumā nepieciešams tikai personu apliecinošs dokuments.",
-           "note": "Klienti, kuri izvēlas paaugstinātu konfidencialitātes līmeni (bez reģistrācijas), seifu nomā pēc individuāla tarifa."},
+           "note": "Klienti, kuri izvēlas paaugstinātu konfidencialitātes līmeni (bez reģistrācijas), seifu nomā pēc tarifa nereģistrētiem klientiem."},
     "ru": {"body": "Без открытия банковского счёта. Содержимое ячейки известно только вам — мы его не проверяем и не регистрируем. При первом визите потребуется только документ, удостоверяющий личность.",
-           "note": "Клиенты, выбирающие повышенный уровень конфиденциальности (без регистрации), арендуют ячейки по индивидуальному тарифу."},
+           "note": "Клиенты, выбирающие повышенный уровень конфиденциальности (без регистрации), арендуют ячейки по тарифу для незарегистрированных клиентов."},
     "en": {"body": "No bank account required. Only you know what is in your box — we do not inspect or register the contents. At your first visit all you need is an identity document.",
-           "note": "Clients who choose the higher level of confidentiality (no registration) rent their boxes at an individual rate."},
+           "note": "Clients who choose the higher level of confidentiality (no registration) rent their boxes at the rate for unregistered clients."},
 }
 
 CERTS = {
-    "lv": "Sertifikāti: EN 1300 C klase · BSI · ECB·S",
-    "ru": "Сертификаты: EN 1300 класс C · BSI · ECB·S",
-    "en": "Certificates: EN 1300 class C · BSI · ECB·S",
+    "lv": "Sertifikāti: EN 1143-1 (11. klase) · EN 1300 (D klase) · BSI · ECB·S",
+    "ru": "Сертификаты: EN 1143-1 (11 класс) · EN 1300 (класс D) · BSI · ECB·S",
+    "en": "Certificates: EN 1143-1 (grade 11) · EN 1300 (class D) · BSI · ECB·S",
 }
 
 # "Why clients choose us" — intro + cards (icon, title, body)
 TRUST = {
     "lv": {
         "intro": "Bankas Latvijā un visā pasaulē pakāpeniski atsakās no seifu nomas. Mēs strādājam kopš 2017. gada un kļuvām par pirmo privāto glabātavu Baltijā tieši tāpēc, ka redzam šo vajadzību: cilvēkiem un uzņēmumiem ir vajadzīga droša vieta vērtslietām — bez banku ierobežojumiem, rindām un darba laika.",
+        # October 2026 review: seven cards, a heading in capitals and the text below it
         "cards": [
-            ("shield", "Kopš 2017. gada", "Atvērāmies brīdī, kad bankas sāka slēgt seifu nodaļas. Šodien — lielākā privātā glabātava Baltijā."),
-            ("box", "3000+ seifu, pieci izmēri", "No plānas dokumentu mapes līdz lielām vērtslietām un mākslas darbiem."),
-            ("lock", "Bez banku ierobežojumiem", "Nekādu kontu, izziņu un bankas darba laika. Jūsu piekļuve — pēc jūsu grafika."),
-            ("users", "1000+ klientu 9 gados", "Privātpersonas, uzņēmumi, notāri, nekustamā īpašuma darījumu dalībnieki — uztic mums to, ko negribas pazaudēt."),
-            ("deal", "Deal Box", "Rīgas Seifi ir neitrāls darījuma garants — atslēgas tiek izsniegtas tikai tad, kad izpildīti līguma nosacījumi."),
-            ("truck", "Apsargāts transfērs", "Organizējam drošu vērtslietu piegādi uz glabātavu vai mājās — nosacījumus saskaņojam individuāli."),
-            ("room", "Sarunu telpa", "Konfidenciāla telpa dokumentu parakstīšanai turpat glabātavā. Bez video novērošanas iekšpusē."),
+            ("shield", "Drošība", "2 bruņotas pazemes glabātavas ar smagām seifu durvīm, mehāniskām un elektroniskām slēdzenēm, kuru aizsardzība atbilst Eiropas standartiem EN 1143-1 (11. klase) un EN 1300 (D klase). Diennakts apsardze."),
+            ("award", "Pieredze", "Kopš 2017. gada esam starptautiskās federācijas Safe Deposit Federation biedri. Lielākā privātā glabātava Baltijā."),
+            ("lock", "Konfidencialitāte", "Maksimāla jūsu datu un jūsu seifa satura datu aizsardzība. Iespējama pilnīga anonimitāte."),
+            ("globe", "Bez banku ierobežojumiem", "Bez banku anketēšanas. Pieejams ar jebkuru pilsonību un jebkuru nodokļu rezidenci."),
+            ("clock", "Pieejamība", "24/7 pēc vienošanās un bez ierobežojumiem darba laikā. Noformēšana uzreiz, bez iepriekšēja pieraksta, 10 minūšu laikā."),
+            ("deal", "Deal Box", "Samazina darījumu riskus. Rīgas Seifi ir neitrāls trīspusēja darījuma garants — atslēgas tiek izsniegtas tikai tad, kad izpildīti pušu noslēgtā līguma nosacījumi. Darījumam tiek nodrošināta aizsargāta, konfidenciāla telpa bez video novērošanas."),
+            ("truck", "Apsargāts transfērs", "Organizējam drošu vērtslietu piegādi uz glabātavu vai mājās — nosacījumi tiek saskaņoti individuāli."),
         ],
     },
     "ru": {
         "intro": "Банки в Латвии и по всему миру сворачивают услугу сейфовых ячеек. Мы работаем с 2017 года и стали первым частным хранилищем в Балтии именно потому, что видим эту потребность: людям и бизнесу нужно надёжное место для ценностей — без банковских ограничений, очередей и графика.",
+        # October 2026 review: seven cards, a heading in capitals and the text below it
         "cards": [
-            ("shield", "С 2017 года", "Открылись, когда банки начали закрывать сейфовые отделения. Сегодня — крупнейшее частное хранилище в Балтии."),
-            ("box", "3000+ ячеек, пять размеров", "От тонкой папки с документами до крупных ценностей и предметов искусства."),
-            ("lock", "Без банковских ограничений", "Никаких счетов, справок и графика работы банка. Ваш доступ — по вашему расписанию."),
-            ("users", "1000+ клиентов за 9 лет", "Частные лица, компании, нотариусы, участники сделок с недвижимостью — доверяют нам то, что не хочется потерять."),
-            ("deal", "Deal Box", "Rīgas Seifi выступает нейтральным гарантом сделки — ключи выдаются только при выполнении условий договора."),
-            ("truck", "Охраняемый трансфер", "Организуем безопасную доставку ценностей до хранилища или домой — условия индивидуально."),
-            ("room", "Переговорная комната", "Конфиденциальное пространство для подписания документов прямо в хранилище. Без видеонаблюдения внутри."),
+            ("shield", "Безопасность", "2 бронированные подземные капсулы, оборудованные тяжёлыми сейфовыми дверями, механическими и электронными замками с защитой по европейским стандартам EN 1143-1 (11 класс), EN 1300 (D класс), круглосуточная охрана."),
+            ("award", "Опыт", "С 2017 года являемся членом международной федерации Safe Deposit Federation, крупнейшее частное хранилище в Балтии."),
+            ("lock", "Конфиденциальность", "Максимальная защита Ваших данных и данных о содержимом Вашей ячейки, возможна полная анонимность."),
+            ("globe", "Без банковских ограничений", "Нет банковского анкетирования, доступно с любым гражданством и любой налоговой резиденцией."),
+            ("clock", "Доступность", "24/7 по договорённости и без ограничений в рабочее время. Оформление сразу, без предварительной записи, в течение 10 минут."),
+            ("deal", "Deal Box", "Снижает риски при сделках. Rīgas Seifi выступает нейтральным гарантом трёхсторонней сделки — ключи выдаются только при выполнении условий заключённого сторонами договора. Предоставляется защищённое, конфиденциальное помещение без видеонаблюдения для проведения сделки."),
+            ("truck", "Охраняемый трансфер", "Организуем безопасную доставку ценностей до хранилища или домой — условия оговариваются индивидуально."),
         ],
     },
     "en": {
         "intro": "Banks in Latvia and around the world are winding down safe deposit services. We have been working since 2017 and became the first private vault in the Baltics precisely because we see the need: people and businesses want a reliable place for their valuables — without bank restrictions, queues or opening hours.",
+        # October 2026 review: seven cards, a heading in capitals and the text below it
         "cards": [
-            ("shield", "Since 2017", "We opened when banks started closing their safe deposit departments. Today we are the largest private vault in the Baltics."),
-            ("box", "3,000+ boxes, five sizes", "From a slim folder of documents to large valuables and works of art."),
-            ("lock", "No banking restrictions", "No accounts, no certificates, no banking hours. Your access runs on your schedule."),
-            ("users", "1,000+ clients in 9 years", "Private individuals, companies, notaries and parties to property deals trust us with what they would rather not lose."),
-            ("deal", "Deal Box", "Rīgas Seifi acts as the neutral guarantor of a transaction — the keys are released only once the terms of the agreement are met."),
-            ("truck", "Guarded transfer", "We arrange secure delivery of valuables to the vault or to your home — terms agreed individually."),
-            ("room", "Meeting room", "A confidential space for signing documents right inside the vault. No video surveillance inside."),
+            ("shield", "Security", "Two armoured underground vaults with heavy vault doors and mechanical and electronic locks, protected to the European standards EN 1143-1 (grade 11) and EN 1300 (class D). Round-the-clock security."),
+            ("award", "Experience", "A member of the international Safe Deposit Federation since 2017, and the largest private vault in the Baltics."),
+            ("lock", "Confidentiality", "Maximum protection of your data and of any data about the contents of your box. Full anonymity is possible."),
+            ("globe", "No banking restrictions", "No bank questionnaires. Open to clients of any citizenship and any tax residency."),
+            ("clock", "Access", "24/7 by arrangement, and without restriction during business hours. Sign up on the spot in 10 minutes, with no appointment needed."),
+            ("deal", "Deal Box", "Reduces the risk in a transaction. Rīgas Seifi acts as the neutral guarantor of a three-party deal, and the keys are released only once the terms of the parties' agreement are met. A secure, confidential room without video surveillance is provided for the deal."),
+            ("truck", "Guarded transfer", "We arrange secure delivery of valuables to the vault or to your home, on terms agreed individually."),
         ],
     },
 }
@@ -573,26 +616,34 @@ REQUISITES = {
     ],
 }
 
-# hero per language: eyebrow, title, subtitle, 4 stats (value,label)
+# hero per language: eyebrow, title, subtitle, 4 stats (value, label) for the
+# navy band under the hero, and the footnote that explains the asterisk.
+# Title, subtitle and stats follow the October 2026 review.
 HERO = {
     "lv": {"eyebrow": "Pirmā privātā seifu glabātava Baltijā",
-           "title": "Seifu glabātava pašā Rīgas centrā",
-           "sub": "Vērtīgākais — trīskāršā aizsardzībā. Noformēšana 10 minūtēs. 100 % konfidencialitāte. No €30 mēnesī.",
-           "stats": [("3000+", "seifu"), ("2", "pazemes glabātavas"), ("24/7", "piekļuve pēc vienošanās"), ("2017", "strādājam kopš")]},
+           "title": "Bruņota seifu glabātava Vecrīgā",
+           "sub": "Vērtslietu aizsardzība pret zādzību ar ielaušanos, plūdiem, ugunsgrēku un sprādzienu. Pilnīga konfidencialitāte. Noformēšana 10 minūtēs. No 27,50 eiro mēnesī.",
+           "stats": [("100%", "konfidencialitāte un anonimitāte"), ("10 min", "noformēšana"),
+                     ("27,50 €*", "no 27,50 eiro mēnesī"), ("kopš 2017", "Baltijas tirgū")],
+           "stats_note": "* Viena mēneša cena, nomājot seifu uz 24 mēnešiem."},
     "ru": {"eyebrow": "Первое частное сейфовое хранилище в Балтии",
-           "title": "Сейфовое хранилище в самом центре Риги",
-           "sub": "Самое ценное под тройной защитой. Оформление за 10 минут. 100 % конфиденциальность. От €30 в месяц.",
-           "stats": [("3000+", "ячеек"), ("2", "подземных хранилища"), ("24/7", "доступ по договорённости"), ("2017", "работаем с")]},
+           "title": "Бронированное сейфовое хранилище в Старой Риге",
+           "sub": "Защита ценных вещей от кражи со взломом, потопа, пожара и взрыва. Полная конфиденциальность. Оформление за 10 минут. От 27,50 евро в месяц.",
+           "stats": [("100%", "конфиденциальность и анонимность"), ("10 мин", "оформление"),
+                     ("27,50 €*", "от 27,50 евро в месяц"), ("с 2017", "на рынке Балтии")],
+           "stats_note": "* Цена одного месяца при аренде сейфа на 24 месяца."},
     "en": {"eyebrow": "The first private safe depository in the Baltics",
-           "title": "A safe deposit vault in the very centre of Riga",
-           "sub": "Your most valuable things under triple protection. Paperwork in 10 minutes. 100 % confidentiality. From €30 a month.",
-           "stats": [("3000+", "deposit boxes"), ("2", "underground vaults"), ("24/7", "access by arrangement"), ("2017", "operating since")]},
+           "title": "An armoured safe deposit vault in Old Riga",
+           "sub": "Protection for your valuables against burglary, flood, fire, and explosion. Full confidentiality. Sign-up in 10 minutes. From €27.50 a month.",
+           "stats": [("100%", "confidentiality and anonymity"), ("10 min", "sign-up"),
+                     ("€27.50*", "from €27.50 a month"), ("since 2017", "on the Baltic market")],
+           "stats_note": "* The price of one month when a box is rented for 24 months."},
 }
 
 # section headings used across pages
 H = {
     "lv": {"sizes": "Seifu izmēri un cenas",
-           "sizes_sub": "Atklātas cenas bez slēptiem maksājumiem. Jo ilgāks nomas termiņš, jo zemāka mēneša maksa.",
+           "sizes_sub": "Cena ir atkarīga no seifa izmēra, nomas termiņa un līguma nosacījumiem.",
            "how": "Kā tas notiek", "security": "Drošība bez kompromisiem",
            "trust": "Kāpēc mūs izvēlējušies 1000+ klientu 9 gados",
            "partners": "Mūsu partneri", "privacy": "Konfidencialitāte",
@@ -603,11 +654,16 @@ H = {
            "location": "Adrese un darba laiks", "faq": "Biežāk uzdotie jautājumi", "services": "Mūsu pakalpojumi",
            "book": "Rezervējiet seifu jau šodien",
            "book_sub": "Noskaidrojiet, vai vajadzīgais izmērs ir pieejams, un rezervējiet to vienā ziņā.",
-           "price_note": "Norādīti tarifi reģistrētiem klientiem ar 12 mēnešu līgumu. Pieejami arī 1 un 24 mēnešu termiņi. Minimālais termiņš — 1 mēnesis.",
-           "table_size": "Izmērs", "table_dim": "Izmēri (A×P×Dz)", "table_fits": "Kas ietilpst", "table_m1": "1 mēn.", "table_m12": "12 mēn.", "table_m24": "24 mēn.",
-           "table_service": "Pakalpojums", "table_price": "Cena"},
-    "ru": {"sizes": "Размеры и цены ячеек",
-           "sizes_sub": "Прозрачные цены без скрытых платежей. Чем дольше срок аренды, тем ниже месячная ставка.",
+           "price_note": "Visas cenas norādītas ar PVN.",
+           # price tables (boxes page), headed like the owners' 2025 price list
+           "tab_reg": "Reģistrētiem klientiem", "tab_unreg": "Nereģistrētiem klientiem",
+           "table_nr": "Numurs", "table_size": "Izmērs, mm", "table_h": "Augstums", "table_h_short": "Augst.", "table_w": "Platums", "table_l": "Garums",
+           "table_term": "Īres termiņš · cena mēnesī, €",
+           "terms": {1: ("1 mēnesis", "1 mēn."), 3: ("3 mēneši", "3 mēn."), 6: ("6 mēneši", "6 mēn."), 12: ("12 mēneši", "12 mēn."), 24: ("24 mēneši", "24 mēn.")},
+           "table_wl_note": "Visu seifu platums ir 245 mm, garums 435 mm.",
+           "table_service": "Pakalpojumi, tarifi", "table_price": "Cena"},
+    "ru": {"sizes": "Размеры ячеек и цены",
+           "sizes_sub": "Цена зависит от размера ячейки, срока аренды и условий договора.",
            "how": "Как это работает", "security": "Безопасность без компромиссов",
            "trust": "Почему нас выбрали 1000+ клиентов за 9 лет",
            "partners": "Наши партнёры", "privacy": "Конфиденциальность",
@@ -618,11 +674,15 @@ H = {
            "location": "Адрес и часы работы", "faq": "Частые вопросы", "services": "Наши услуги",
            "book": "Забронируйте ячейку сегодня",
            "book_sub": "Уточните наличие нужного размера и оформите бронь за одно сообщение.",
-           "price_note": "Указаны тарифы для зарегистрированных клиентов при договоре на 12 месяцев. Доступны также сроки 1 и 24 месяца. Минимальный срок — 1 месяц.",
-           "table_size": "Размер", "table_dim": "Размеры (В×Ш×Г)", "table_fits": "Что помещается", "table_m1": "1 мес.", "table_m12": "12 мес.", "table_m24": "24 мес.",
-           "table_service": "Услуга", "table_price": "Стоимость"},
+           "price_note": "Все цены указаны с НДС.",
+           "tab_reg": "Для зарегистрированных клиентов", "tab_unreg": "Для незарегистрированных клиентов",
+           "table_nr": "Номер", "table_size": "Размер, мм", "table_h": "Высота", "table_h_short": "Выс.", "table_w": "Ширина", "table_l": "Длина",
+           "table_term": "Срок аренды · цена за месяц, €",
+           "terms": {1: ("1 месяц", "1 мес."), 3: ("3 месяца", "3 мес."), 6: ("6 месяцев", "6 мес."), 12: ("12 месяцев", "12 мес."), 24: ("24 месяца", "24 мес.")},
+           "table_wl_note": "Ширина всех ячеек 245 мм, длина 435 мм.",
+           "table_service": "Услуги, тарифы", "table_price": "Стоимость"},
     "en": {"sizes": "Box sizes and prices",
-           "sizes_sub": "Transparent pricing with no hidden fees. The longer the rental term, the lower the monthly rate.",
+           "sizes_sub": "The price depends on the box size, the rental term, and the terms of the agreement.",
            "how": "How it works", "security": "Security without compromise",
            "trust": "Why 1,000+ clients have chosen us in 9 years",
            "partners": "Our partners", "privacy": "Confidentiality",
@@ -633,9 +693,13 @@ H = {
            "location": "Location and opening hours", "faq": "Frequently asked questions", "services": "Our services",
            "book": "Book your box today",
            "book_sub": "Check that the size you need is available and book it in a single message.",
-           "price_note": "Rates shown are for registered clients on a 12-month agreement. 1 and 24-month terms are also available. Minimum term — 1 month.",
-           "table_size": "Size", "table_dim": "Dimensions (H×W×D)", "table_fits": "What fits", "table_m1": "1 mo", "table_m12": "12 mo", "table_m24": "24 mo",
-           "table_service": "Service", "table_price": "Price"},
+           "price_note": "All prices include VAT.",
+           "tab_reg": "Registered clients", "tab_unreg": "Unregistered clients",
+           "table_nr": "No.", "table_size": "Size, mm", "table_h": "Height", "table_h_short": "Ht.", "table_w": "Width", "table_l": "Length",
+           "table_term": "Rental term · price per month, €",
+           "terms": {1: ("1 month", "1 mo"), 3: ("3 months", "3 mo"), 6: ("6 months", "6 mo"), 12: ("12 months", "12 mo"), 24: ("24 months", "24 mo")},
+           "table_wl_note": "Every box is 245 mm wide and 435 mm long.",
+           "table_service": "Services, fees", "table_price": "Price"},
 }
 
 # Additional services price list (boxes page). VAT included except the key deposit.
@@ -767,19 +831,19 @@ ABOUT = {
 HOWX = {
     "lv": {
         "need_t": "Kas nepieciešams", "need": ["Reģistrētam klientam — personu apliecinošs dokuments.",
-            "Klientam bez reģistrācijas — dokumenti nav nepieciešami; noma pēc individuāla tarifa.", "Uzņēmumam — reģistrācijas dati un pārstāvja pilnvara."],
+            "Klientam bez reģistrācijas — dokumenti nav nepieciešami; noma pēc tarifa nereģistrētiem klientiem.", "Uzņēmumam — reģistrācijas dati un pārstāvja pilnvara."],
         "pay_t": "Apmaksa", "pay": ["Skaidrā naudā, ar karti vai pārskaitījumu.", "Atļauta trešās puses apmaksa, norādot rēķina numuru.", "Atslēgas nodrošina ar drošības depozītu (atmaksā līguma beigās)."],
         "access_t": "Piekļuve un noteikumi", "access": ["Standarta apmeklējums — līdz 15 minūtēm.", "Piekļuvei nepieciešams seifa numurs, PIN un atslēga.", "Termiņš no 1 mēneša; pagarinājums — vienkārši apmaksājot nākamo periodu."],
     },
     "ru": {
         "need_t": "Что нужно", "need": ["Зарегистрированному клиенту — документ, удостоверяющий личность.",
-            "Клиенту без регистрации — документы не нужны; аренда по индивидуальному тарифу.", "Компании — регистрационные данные и доверенность представителя."],
+            "Клиенту без регистрации — документы не нужны; аренда по тарифу для незарегистрированных клиентов.", "Компании — регистрационные данные и доверенность представителя."],
         "pay_t": "Оплата", "pay": ["Наличными, картой или переводом.", "Допускается оплата третьим лицом с указанием номера счёта.", "Ключи обеспечиваются гарантийным депозитом (возвращается в конце аренды)."],
         "access_t": "Доступ и правила", "access": ["Стандартный визит — до 15 минут.", "Для доступа нужны номер ячейки, PIN и ключ.", "Срок от 1 месяца; продление — простой оплатой следующего периода."],
     },
     "en": {
         "need_t": "What you need", "need": ["Registered client — an identity document.",
-            "Client without registration — no documents required; rental at an individual rate.", "Company — registration details and a representative's authorisation."],
+            "Client without registration — no documents required; rental at the rate for unregistered clients.", "Company — registration details and a representative's authorisation."],
         "pay_t": "Payment", "pay": ["Cash, card or bank transfer.", "Third-party payment is allowed if the invoice number is given.", "Keys are secured by a guaranty deposit (refunded at the end of the rental)."],
         "access_t": "Access and rules", "access": ["A standard visit is up to 15 minutes.", "Access requires the box number, PIN and key.", "Term from 1 month; extend simply by paying for the next period."],
     },
@@ -825,18 +889,57 @@ FAQ = {
     ],
 }
 
-# Blog: planned article titles (stubs for now) per language
+# News (the "blog" page, renamed in the October 2026 review): planned post titles, stubs for now
 BLOG = {
-    "lv": {"intro": "Padomi par vērtslietu glabāšanu un seifu nomu. Pirmie raksti drīzumā.",
+    "lv": {"intro": "Rīgas Seifi jaunumi un padomi par vērtslietu glabāšanu. Pirmās publikācijas drīzumā.",
            "soon": "Drīzumā", "posts": ["Ko glabāt sefa jeb seifa janā", "Seifa jeb sefs mājās vai privātā glabātavā?",
             "Bankas jeb privātais seifs: kāda atšķirība?", "Kā pasargāt dokumentus ugunsgrēka gadījumā",
             "Ko nedrīkst glabāt mājās", "Kā nomāt seifu Rīgā"]},
-    "ru": {"intro": "Советы о хранении ценностей и аренде сейфа. Первые статьи скоро.",
+    "ru": {"intro": "Новости Rīgas Seifi и советы о хранении ценностей. Первые публикации скоро.",
            "soon": "Скоро", "posts": ["Что хранить в сейфовой ячейке", "Сейф дома или в частном хранилище?",
             "Банковский или частный сейф: в чём разница?", "Как защитить документы при пожаре",
             "Что нельзя хранить дома", "Как арендовать сейф в Риге"]},
-    "en": {"intro": "Guides on storing valuables and renting a safe deposit box. First articles coming soon.",
+    "en": {"intro": "News from Rīgas Seifi and guides on storing valuables. The first posts are coming soon.",
            "soon": "Soon", "posts": ["What to store in a safe deposit box", "A safe at home or in a private vault?",
             "Bank vs private safe: what is the difference?", "How to protect documents in a fire",
             "What you should not keep at home", "How to rent a safe deposit box in Riga"]},
+}
+
+# =====================================================================
+#  AGENTS  —  the partnership programme, moved to the footer in the
+#  October 2026 review. The copy is the old site's "Aģentiem" page
+#  (rigasseifi.lv/partneru-programma, checked 27 October 2026), in its
+#  three languages; the English is lightly corrected.
+# =====================================================================
+AGENTS = {
+    "lv": {"sub": "Partneru programma",
+           "intro": "Aicinām uz sadarbību jaunus partnerus un aktīvus profesionāļus! Piedāvājam iespēju nopelnīt fiksētus procentus no jūsu piesaistīto klientu saņemto līdzekļu summas par seifu īri.",
+           "steps_t": "Kā tas strādā",
+           "steps": ["Noslēdziet ar mums līgumu.",
+                     "Pa telefonu rezervējiet pie mums vēlamā izmēra noteiktu seifu skaitu.",
+                     "Paziņojiet klientam nepieciešamā izmēra rezervētā seifa numuru.",
+                     "Klients, apmeklējot mūsu kompāniju, paziņo rezervētā seifa numuru un apmaksā seifa īri.",
+                     "Mēneša beigās mēs izmaksājam jūsu ienākumus jums ērtā veidā."],
+           "more_t": "Joprojām ir jautājumi?",
+           "more": "Rakstiet mums, ja neatrodat vajadzīgo atbildi."},
+    "ru": {"sub": "Партнёрская программа",
+           "intro": "Приглашаем к сотрудничеству новых партнёров и активных профессионалов! Предоставляем возможность заработать фиксированный процент с суммы полученных средств от вами привлечённых клиентов за аренду сейфовых ячеек.",
+           "steps_t": "Как это работает",
+           "steps": ["Заключаете договор с нами.",
+                     "По телефону резервируете у нас необходимое количество сейфовых ячеек желаемого размера.",
+                     "Сообщаете своему клиенту номер зарезервированной вами сейфовой ячейки необходимого клиенту размера.",
+                     "Клиент при посещении нашей компании сообщает номер зарезервированной ячейки и производит оплату за её аренду.",
+                     "В конце месяца мы выплачиваем ваш доход в удобной для вас форме."],
+           "more_t": "Остались вопросы?",
+           "more": "Если вы не нашли ответ на интересующий вас вопрос, напишите нам, и мы обязательно ответим."},
+    "en": {"sub": "Partnership programme",
+           "intro": "We invite new partners and active professionals to work with us. We pay a fixed percentage of the rental paid by the clients you bring to us.",
+           "steps_t": "How it works",
+           "steps": ["You sign an agreement with us.",
+                     "You reserve the number of boxes you need, in the sizes you need, by phone.",
+                     "You give your client the number of the box reserved for them.",
+                     "When the client visits us, they give the number of the reserved box and pay the rent.",
+                     "At the end of the month we pay your income in the way that suits you."],
+           "more_t": "Any questions?",
+           "more": "If you have not found the answer you need, write to us and we will reply."},
 }

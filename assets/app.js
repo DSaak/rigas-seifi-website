@@ -38,6 +38,45 @@ if (navToggle && mobileNav) {
     }));
 }
 
+/* ---- Contact button (bottom right): opens the menu of ways to reach us ---- */
+const fabBtn = document.getElementById("contactFabBtn");
+const fabMenu = document.getElementById("contactMenu");
+if (fabBtn && fabMenu) {
+  const setFab = open => {
+    fabMenu.hidden = !open;
+    fabBtn.setAttribute("aria-expanded", open);
+    fabBtn.classList.toggle("open", open);
+  };
+  fabBtn.addEventListener("click", e => { e.stopPropagation(); setFab(fabMenu.hidden); });
+  document.addEventListener("click", e => { if (!fabMenu.hidden && !fabMenu.contains(e.target)) setFab(false); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !fabMenu.hidden) { setFab(false); fabBtn.focus(); } });
+  fabMenu.querySelectorAll("a").forEach(a => a.addEventListener("click", () => setFab(false)));
+}
+
+/* ---- Price tables: registered / unregistered tabs. Without this script
+   both tables stay on the page, each under its own title. ---- */
+const priceTabs = document.querySelector(".price-tabs");
+if (priceTabs) {
+  const tabs = [...priceTabs.querySelectorAll('[role="tab"]')];
+  const show = tab => tabs.forEach(t => {
+    const on = t === tab;
+    t.setAttribute("aria-selected", on);
+    t.tabIndex = on ? 0 : -1;
+    document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+  });
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => show(t));
+    t.addEventListener("keydown", e => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      const next = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+      show(next); next.focus();
+    });
+  });
+  priceTabs.hidden = false;
+  document.body.classList.add("price-tabs-on");
+  show(tabs[0]);
+}
+
 /* ---- Lightweight GA4 click tracking hooks ---- */
 function track(ev) { if (typeof gtag === "function") gtag("event", ev); }
 document.querySelectorAll('[data-track]').forEach(el =>
@@ -156,6 +195,7 @@ function setupCounters() {
     if (!Number.isFinite(value) || value < 100) return null;   // too small to be worth it
     if (/^(19|20)\d{2}$/.test(digits)) return null;             // a year, not a quantity
     if (raw.includes("/")) return null;                        // "24/7"
+    if (raw.includes("€")) return null;                        // a price: "27,50 €" would count to 2750
     const sep = /[\s,\u00a0]/.test(m[0]) ? m[0].match(/[\s,\u00a0]/)[0] : "";
     return { raw, value, start: m.index, len: m[0].length, sep };
   };
