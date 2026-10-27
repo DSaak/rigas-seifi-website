@@ -62,7 +62,8 @@ ASSET = "../assets"
 
 def _fingerprint(name):
     """Short content hash appended to asset URLs. Without it, browsers keep
-    serving the previous styles.css/app.js after a deploy."""
+    serving the previous styles.css/app.js (and favicons, which they cache
+    hardest of all) after a deploy."""
     import hashlib
     path = os.path.join(ASSETS_SRC, name)
     try:
@@ -239,9 +240,9 @@ def head(lang, page):
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="{ASSET}/img/favicon.ico" sizes="32x32">
-<link rel="icon" href="{ASSET}/img/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="{ASSET}/img/apple-touch-icon.png">
+<link rel="icon" href="{asset("img/favicon.ico")}" sizes="32x32">
+<link rel="icon" href="{asset("img/favicon.svg")}" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{asset("img/apple-touch-icon.png")}">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
 <meta name="keywords" content="{esc(kw)}">
@@ -952,7 +953,7 @@ def build():
     # root language redirect (x-default)
     root = f"""<!DOCTYPE html><html lang="{C.DEFAULT_LANG}"><head><meta charset="UTF-8">
 <title>{esc(S['brand'])}</title>
-<link rel="icon" href="assets/img/favicon.ico" sizes="32x32">
+<link rel="icon" href="assets/img/favicon.ico?v={_fingerprint("img/favicon.ico")}" sizes="32x32">
 <link rel="canonical" href="{S['domain']}/{C.DEFAULT_LANG}/">
 {''.join(f'<link rel="alternate" hreflang="{l}" href="{S["domain"]}/{l}/">' for l in C.LANGS)}
 <link rel="alternate" hreflang="x-default" href="{S['domain']}/{C.DEFAULT_LANG}/">

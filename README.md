@@ -177,7 +177,10 @@ centre so they never cross a ring hole. Colour comes from `currentColor`, so
 the mark is gold in the header and takes the surrounding tone elsewhere.
 
 The icons live in `assets/img/` and are linked from every page head:
-- `favicon.svg` — the detailed mark on a navy tile.
+- `favicon.svg` — the detailed mark on a navy tile. Since October 2026 the
+  keys are white in all three files, as in the header logo. The .ico and
+  .png were recoloured pixel by pixel (each navy–gold blend became the same
+  navy–white blend), so the 16px artwork below is unchanged in shape.
 - `favicon.ico` — three frames, and **the 16px frame is different artwork**.
   At that size the ring holes close up and the mark turns to mush, so 16px
   uses a simplified drawing with solid bows and heavier shafts, while 32 and
@@ -187,7 +190,9 @@ The icons live in `assets/img/` and are linked from every page head:
   masks the corners itself.
 
 `build.py` also copies `favicon.ico` to the site root, because browsers ask
-for `/favicon.ico` whether or not a `<link>` points at it.
+for `/favicon.ico` whether or not a `<link>` points at it. The `<link>` tags
+carry a content hash (`?v=`), like the stylesheet, so a changed icon reaches
+returning visitors.
 
 ## Header breakpoints
 The desktop nav switches on at **1120px**, not 900px: six Russian nav labels
