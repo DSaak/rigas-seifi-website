@@ -151,6 +151,13 @@ RU and EN (forwarded 11 October). What changed:
   The privacy note and how-it-works no longer call the unregistered rate
   "individual", since the price list publishes it. Meta titles quote
   €27,50. The key emoji left the promo ribbon.
+- **Follow-up (v25).** The home hero shows the vault again, the aisle
+  between the rows of boxes (frame 116), as asked after the review. The
+  façade (frame 13) stays on the contacts page, and the video slot's
+  poster moved to the box rows (frame 113) so the aisle is not shown twice.
+  The "why us" titles size themselves to their card with a container query
+  (`cqi`), so КОНФИДЕНЦИАЛЬНОСТЬ stays on one line at every width instead
+  of being split across two.
 
 ## Video
 Fill one source in `VIDEO` in content.py. `"file"` takes an .mp4 placed in

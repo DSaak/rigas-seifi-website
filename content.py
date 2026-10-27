@@ -428,8 +428,9 @@ TRUST = {
 
 # =====================================================================
 #  PHOTOS  —  slot -> file in assets/img/photos/ + alt text per language.
-#  The hero shows the façade of Kaļķu iela 26, so a first-time visitor sees
-#  the building before the vault (asked for in the September 2026 review).
+#  The hero shows the vault itself, the aisle between the rows of boxes
+#  (asked for after the October 2026 review). It showed the façade of
+#  Kaļķu iela 26 from September; that frame stays on the contacts page.
 #  Source: the 28 August 2026 shoot of the Kaļķu iela 26 premises
 #  (127 frames). Everything here is a full-resolution frame from that
 #  shoot, resized for the web, except "about1", which is captioned
@@ -439,11 +440,10 @@ TRUST = {
 #  "photo goes here" panel automatically.
 # =====================================================================
 PHOTOS = {
-    "hero": {"file": "riga-centre.jpg",  # frame 13, the K26 façade
-             "pos": "66% 50%",  # the K26 building sits right of centre in the frame
-             "lv": "Ēka Kaļķu ielā 26 Vecrīgā",
-             "ru": "Здание на Kaļķu iela 26 в Старой Риге",
-             "en": "The building at Kaļķu iela 26 in Old Riga"},
+    "hero": {"file": "vault-aisle.jpg",  # frame 116, the vault aisle
+             "lv": "Eja starp seifu rindām glabātavā Kaļķu ielā 26",
+             "ru": "Проход между рядами ячеек в хранилище на Kaļķu iela 26",
+             "en": "The aisle between the rows of boxes in the vault at Kaļķu iela 26"},
     "step1": {"file": "box-sizes.jpg",  # frame 126,
              "lv": "Pieci seifu izmēri blakus — no mazākā līdz lielākajam",
              "ru": "Пять размеров ячеек рядом — от меньшего к большему",
@@ -584,7 +584,7 @@ VIDEO = {
     "show": True,
     "file": "",
     "embed": "",
-    "poster": "vault-aisle.jpg",  # frame 116, the vault aisle that used to be the hero
+    "poster": "vault-rows.jpg",  # frame 113; the vault aisle (frame 116) is the hero again
     "heading": {"lv": "Video par Rīgas Seifi",
                 "ru": "Видео о Rīgas Seifi",
                 "en": "Rīgas Seifi on video"},
