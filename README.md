@@ -227,6 +227,7 @@ Unique title/description/keywords per page per language, canonical + hreflang
 BreadcrumbList on inner pages), sitemap with hreflang alternates, robots.txt.
 
 ## Advert ribbon (bright top bar)
+Switched off on 28 October 2026 (it carried the −50 % opening offer).
 Controlled by the `PROMO` block at the top of `content.py`:
 - `"active": True / False` — turn the bar on or off everywhere.
 - `"lv"/"ru"/"en"` — the text per language.

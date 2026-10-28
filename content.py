@@ -18,7 +18,7 @@ DEFAULT_LANG = "lv"
 #  After any change: run python3 build.py (or double-click publish.command).
 # =====================================================================
 PROMO = {
-    "active": True,
+    "active": False,
     "link": "#book",   # where clicking the bar takes the visitor
     "lv": "Atvēršanas akcija — pirmais mēnesis −50 %. Vietu skaits ierobežots.",
     "ru": "Акция к открытию — первый месяц −50 %. Количество мест ограничено.",
